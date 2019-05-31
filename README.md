@@ -6,11 +6,15 @@ Demo(TBD) / Documentation(TBD)
 
 ![GitHub Logo](screenshots/img-360.gif)
 
-## custom elements
+## Custom element tags
 
 - \<img-360\>
 - \<video-360\>
 - other new elements coming later
+
+## Immersive mode
+
+You can enter immersive mode by clicking "ENTER VR" button if you have a HMD.
 
 ## Usage
 
@@ -28,6 +32,8 @@ Demo(TBD) / Documentation(TBD)
 ```
 
 ## How to take 360 picture/video
+
+- [RICOH THETA](https://theta360.com/)
 
 ## Development
 
