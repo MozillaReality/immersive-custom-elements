@@ -42,7 +42,7 @@ Demo(TBD) / Documentation(TBD)
 ### \<video-360\>
 
 ```javascript
-<video-360 src="video.mp4" width="640" height="480" />
+<video-360 src="video.mp4" width="640" height="480"></video>
 ```
 
 | attribute | type | description |
