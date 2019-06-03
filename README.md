@@ -61,7 +61,7 @@ Demo(TBD) / Documentation(TBD)
   <img360 src="imagefile1.jpg" />
   <img360 src="imagefile2.jpg" />
   <img360 src="imagefile3.jpg" />
-<\img360-tour>
+</img360-tour>
 ```
 
 \<img360-tour\>
