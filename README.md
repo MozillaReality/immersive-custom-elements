@@ -103,6 +103,7 @@ $ npm run build
 ## Similar projects
 
 - [model-viewer](https://github.com/GoogleWebComponents/model-viewer)
+- [A-Frame](https://aframe.io/)
 
 ## License
 
