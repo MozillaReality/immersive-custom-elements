@@ -23,6 +23,7 @@ Demo(TBD) / Documentation(TBD)
 
 - \<img-360\>
 - \<video-360\>
+- \<img360-tour\>
 - other new elements coming later
 
 ### \<img-360\>
@@ -52,6 +53,33 @@ Demo(TBD) / Documentation(TBD)
 | height | number | element height |
 
 ![GitHub Logo](screenshots/video-360.gif)
+
+### \<img360-tour\>
+
+```javascript
+<img360-tour width="640" height="480">
+  <img360 src="imagefile1.jpg" />
+  <img360 src="imagefile2.jpg" />
+  <img360 src="imagefile3.jpg" />
+<\img360-tour>
+```
+
+\<img360-tour\>
+
+| attribute | type | description |
+| ---- | ---- | ---- |
+| width | number | element width |
+| height | number | element height |
+
+\<img360\>
+
+| attribute | type | description |
+| ---- | ---- | ---- |
+| src | strings | Path to image file |
+
+![GitHub Logo](screenshots/image360-tour.gif)
+
+Note: Doesn't work on FireFox yet
 
 ## Immersive mode
 
