@@ -79,8 +79,6 @@ Demo(TBD) / Documentation(TBD)
 
 ![GitHub Logo](screenshots/image360-tour.gif)
 
-Note: Doesn't work on FireFox yet
-
 ## Immersive mode
 
 You can enter immersive mode by clicking "ENTER VR" button if you have a HMD.
