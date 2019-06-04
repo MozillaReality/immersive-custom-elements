@@ -84,7 +84,11 @@ class Img360Tour extends HTMLElement {
       })
     })
 
-    observer.observe(this, {childList: true})
+    observer.observe(this, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
 
     const hasDevice = device !== null;
 
@@ -239,6 +243,8 @@ class Img360Tour extends HTMLElement {
         }
       }, false);
     }
+
+    traverse(this.children);
   }
 
   _getVRDevice() {
