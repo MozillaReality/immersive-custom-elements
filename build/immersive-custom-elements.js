@@ -49580,7 +49580,11 @@
 	      });
 	    });
 
-	    observer.observe(this, {childList: true});
+	    observer.observe(this, {
+	      childList: true,
+	      characterData: true,
+	      subtree: true
+	    });
 
 	    const hasDevice = device !== null;
 
@@ -49730,6 +49734,8 @@
 	        }
 	      }, false);
 	    }
+
+	    traverse(this.children);
 	  }
 
 	  _getVRDevice() {
