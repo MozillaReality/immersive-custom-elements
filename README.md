@@ -98,6 +98,13 @@ $ npm install
 $ npm run build
 ```
 
+### How to locally run
+
+```sh
+$ npm run start
+# local server boots up. Access http://localhost:8080/examples/index.html on your browser.
+```
+
 ## Similar projects
 
 - [model-viewer](https://github.com/GoogleWebComponents/model-viewer)

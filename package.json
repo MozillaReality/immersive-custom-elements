@@ -2,9 +2,11 @@
   "name": "immersive-custom-elements",
   "version": "0.0.1",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "start": "http-server . -p 8080 -c-1"
   },
   "devDependencies": {
+    "http-server": "^0.11.1",
     "rollup": "^1.12.3",
     "rollup-plugin-node-resolve": "^5.0.0"
   },
