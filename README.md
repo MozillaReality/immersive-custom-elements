@@ -14,7 +14,7 @@ Demo(TBD) / Documentation(TBD)
     <script src="./build/immersive-custom-elements.js"></script>
   </head>
   <body>
-    <img-360 src="./image.jpg" width="640" height="480" />
+    <img-360 src="./image.jpg" width="640" height="480"></img-360>
   </body>
 </html>
 ```
@@ -29,7 +29,7 @@ Demo(TBD) / Documentation(TBD)
 ### \<img-360\>
 
 ```javascript
-<img-360 src="imagefile.jpg" width="640" height="480" />
+<img-360 src="imagefile.jpg" width="640" height="480"></img-360>
 ```
 
 | attribute | type | description |
@@ -58,9 +58,9 @@ Demo(TBD) / Documentation(TBD)
 
 ```javascript
 <img360-tour width="640" height="480">
-  <img360 src="imagefile1.jpg" />
-  <img360 src="imagefile2.jpg" />
-  <img360 src="imagefile3.jpg" />
+  <img360 src="imagefile1.jpg"></img360>
+  <img360 src="imagefile2.jpg"></img360>
+  <img360 src="imagefile3.jpg"></img360>
 </img360-tour>
 ```
 
