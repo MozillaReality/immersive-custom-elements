@@ -1,3 +1,3 @@
-import './src/img-360';
-import './src/img360-tour';
-import './src/video-360';
+import './src/elements/img-360';
+import './src/elements/img360-tour';
+import './src/elements/video-360';
