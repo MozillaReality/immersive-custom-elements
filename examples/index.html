@@ -1,13 +1,28 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <title>immersive-custom-elements examples</title>
     <style>
+      iframe {
+        height: 99%;
+        width: calc(100% - 215px);
+        margin-left: 200px;
+        padding: 0px;
+        top: 1px;
+        position: absolute;
+        border: 1px solid;
+      }
     </style>
   </head>
   <body>
+    <iframe name="iframe" allowfullscreen></iframe>
+
     <ul>
-      <li><a href="./img-360.html">&lt;img-360&gt;</a></li>
-      <li><a href="./img360-tour.html">&lt;img360-tour&gt;</a></li>
-      <li><a href="./video-360.html">&lt;video-360&gt;</a></li>
+      <li><a href="./img-360.html" target="iframe">&lt;img-360&gt;</a></li>
+      <li><a href="./img360-tour.html" target="iframe">&lt;img360-tour&gt;</a></li>
+      <li><a href="./video-360.html" target="iframe">&lt;video-360&gt;</a></li>
     </ul>
+
+    <a href="https://github.com/MozillaReality/immersive-custom-elements" target="_blank">source code</a>
   </body>
 </html>
