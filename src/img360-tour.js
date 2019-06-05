@@ -95,6 +95,7 @@ class Img360Tour extends HTMLElement {
     const shadow = this.attachShadow({mode: 'open'});
 
     const container = document.createElement('div');
+    container.style.position = 'relative';
     shadow.appendChild(container);
 
     const width = parseInt(this.getAttribute('width')) || 0;
@@ -163,10 +164,10 @@ class Img360Tour extends HTMLElement {
     button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
     button.style.display = '';
     button.style.cursor = 'pointer';
-    button.style.left = '30px';
+    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
     button.style.width = '150px';
     button.style.position = 'absolute';
-    button.style.top = '30px';
+    button.style.bottom = '15px';
     button.style.padding = '12px 6px';
     button.style.border = '1px solid #fff';
     button.style.borderRadius = '4px';
