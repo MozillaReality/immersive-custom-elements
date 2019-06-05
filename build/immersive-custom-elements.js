@@ -49352,62 +49352,11 @@
 
 	} );
 
-	class Image360 extends HTMLElement {
-	  connectedCallback() {
-	    this._getVRDevice().then(device => {
-	      this._initialize(device);
-	    });
-	  }
-
-	  _initialize(device) {
+	class VRHelper {
+	  static createButton(canvas, device) {
+	    // Assumes canvas.style.width has 'zzzpx'
+	    const width = parseInt(canvas.style.width) || canvas.width;
 	    const hasDevice = device !== null;
-
-	    const shadow = this.attachShadow({mode: 'open'});
-
-	    const container = document.createElement('div');
-	    container.style.position = 'relative';
-	    shadow.appendChild(container);
-
-	    const src = this.getAttribute('src') || '';
-	    const width = parseInt(this.getAttribute('width')) || 0;
-	    const height = parseInt(this.getAttribute('height')) || 0;
-
-	    const texture = new TextureLoader().load(src, texture => {
-	      texture.wrapS = ClampToEdgeWrapping;
-	      texture.wrapT = ClampToEdgeWrapping;
-	      texture.minFilter = LinearFilter;
-	      render();
-	    });
-
-	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(60, width / height);
-	    camera.position.z = 0.1;
-
-	    const geometry = new SphereBufferGeometry(500, 60, 40);
-	    const material = new MeshBasicMaterial({
-	      map: texture,
-	      side: BackSide
-	    });
-	    const mesh = new Mesh(geometry, material);
-
-	    scene.add(mesh);
-
-	    const renderer = new WebGLRenderer({
-	      antialias: true
-	    });
-	    renderer.setPixelRatio(window.devicePixelRatio);
-	    renderer.setSize(width, height);
-
-	    container.appendChild(renderer.domElement);
-
-	    const controls = new OrbitControls(camera, renderer.domElement);
-	    controls.addEventListener('change', event => {
-	      render();
-	    });
-
-	    function render() {
-	      renderer.render(scene, camera);
-	    }
 
 	    const button = document.createElement('button');
 	    button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
@@ -49427,7 +49376,6 @@
 	    button.style.opacity = '0.5';
 	    button.style.outline = 'none';
 	    button.style.zIndex = '999';
-	    container.appendChild(button);
 
 	    button.addEventListener('mouseenter', event => {
 	      button.style.opacity = '1.0';
@@ -49438,62 +49386,35 @@
 	    }, false);
 
 	    if (hasDevice) {
-	      const cameraCache = {
-	        position: camera.position.clone(),
-	        rotation: camera.rotation.clone()
-	      };
-
 	      button.addEventListener('click', event => {
 	        if (device.isPresenting) {
 	          device.exitPresent();
 	        } else {
-	          device.requestPresent([{source: renderer.domElement}]);
+	          device.requestPresent([{source: canvas}]);
 	        }      }, false);
 
 	      window.addEventListener('vrdisplaypresentchange', event => {
 	        if (device.isPresenting) {
 	          button.textContent = 'EXIT VR';
-	          renderer.vr.enabled = true;
-	          renderer.setAnimationLoop(render);
-	          controls.enabled = false;
-	          cameraCache.position.copy(camera.position);
-	          cameraCache.rotation.copy(camera.rotation);
 	        } else {
 	          button.textContent = 'ENTER VR';
-	          renderer.vr.enabled = false;
-	          renderer.setAnimationLoop(null);
-	          controls.enabled = true;
-	          camera.position.copy(cameraCache.position);
-	          camera.rotation.copy(cameraCache.rotation);
-	          render();
 	        }
 	      }, false);
-
-	      renderer.vr.setDevice(device);
 	    } else {
+	      // If no device, enters fullscreen instead.
 	      button.addEventListener('click', event => {
-	        {
-	          renderer.domElement.requestFullscreen();
-	        }
-	      }, false);
-
-	      window.addEventListener('fullscreenchange', event => {
-	        if (document.fullscreenElement) {
-	          camera.aspect = screen.width / screen.height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(screen.width, screen.height);
-	          render();
+	        if (document.fullscreenElement === null) {
+	          canvas.requestFullscreen();
 	        } else {
-	          camera.aspect = width / height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(width, height);
-	          render();
+	          document.exitFullscreen();
 	        }
 	      }, false);
 	    }
+
+	    return button;
 	  }
 
-	  _getVRDevice() {
+	  static getVRDevice() {
 	    if (!('getVRDisplays' in navigator)) {
 	      return Promise.resolve(null);
 	    }
@@ -49510,100 +49431,77 @@
 	  }
 	}
 
-	customElements.define('img-360', Image360);
-
-	class Img360Tour extends HTMLElement {
-	  connectedCallback() {
-	    this._getVRDevice().then(device => {
-	      this._initialize(device);
-	    });
+	class THREEHelper {
+	  static createSphereMeshFor360(texture) {
+	    return new Mesh(
+	      new SphereBufferGeometry(500, 60, 40),
+	      new MeshBasicMaterial({
+	        map: texture
+	      })
+	    );
 	  }
 
-	  _initialize(device) {
-	    let imageIndex = 0;
-	    const targets = [];
-	    const meshes = [];
-	    const raycaster = new Raycaster();
+	  static createSphereMeshFor360Image(texture) {
+	    const mesh = this.createSphereMeshFor360(texture);
+	    mesh.material.side = BackSide;
+	    return mesh;
+	  }
 
-	    function addImage(element) {
-	      const src = element.getAttribute('src') || '';
+	  static createSphereMeshFor360Video(video) {
+	    return this.createSphereMeshFor360(video);
+	  }
 
-	      const texture = new TextureLoader().load(src, texture => {
+	  static load360ImageTexture(url) {
+	    return new Promise((resolve, reject) => {
+	      const texture = new TextureLoader().load(url, texture => {
 	        texture.wrapS = ClampToEdgeWrapping;
 	        texture.wrapT = ClampToEdgeWrapping;
 	        texture.minFilter = LinearFilter;
-	        render();
-	      });
+	        resolve(texture);
+	      }, undefined, reject);
+	    });
+	  }
 
-	      const geometry = new SphereBufferGeometry(500, 60, 40);
-	      const material = new MeshBasicMaterial({
-	        map: texture,
-	        side: BackSide
-	      });
-	      const mesh = new Mesh(geometry, material);
+	  static create360VideoTexture(video) {
+	    const texture = new Texture(video);
+	    texture.generateMipmaps = false;
+	    texture.wrapS = ClampToEdgeWrapping;
+	    texture.wrapT = ClampToEdgeWrapping;
+	    texture.minFilter = NearestFilter;
+	    texture.maxFilter = NearestFilter;
+	    return texture;
+	  }
 
-	      mesh.visible = meshes.length === 0;
-
-	      scene.add(mesh);
-	      meshes.push(mesh);
-	    }
-
-	    function traverse(children) {
-	      for (let i = 0, il = children.length; i < il; i++) {
-	        const child = children[i];
-	        if (child.tagName === 'IMG360') {
-	          addImage(child);
-	          if (child.children) traverse(child.children);
-	        }
-	      }
-	    }
-
-	    function moveImage() {
-	      imageIndex++;
-	      if (imageIndex >= meshes.length) {
-	        imageIndex = 0;
-	      }
-
-	      for (let i = 0, il = meshes.length; i < il; i++) {
-	        if (i === imageIndex) {
-	          meshes[i].visible = true;
-	        } else {
-	          meshes[i].visible = false;
-	        }
-	      }
-	    }
-
-	    const observer = new MutationObserver(function(mutations) {
-	      mutations.forEach(function(mutation) {
-	        if (mutation.addedNodes.length) {
-	          traverse(mutation.addedNodes);
-	        }
+	  static create360ImageMesh(url) {
+	    return new Promise((resolve, reject) => {
+	      this.load360ImageTexture(url).then(texture => {
+	        resolve(this.createSphereMeshFor360Image(texture));
 	      });
 	    });
+	  }
 
-	    observer.observe(this, {
-	      childList: true,
-	      characterData: true,
-	      subtree: true
-	    });
+	  static create360VideoMesh(texture, eye) {
+	    const mesh = this.createSphereMeshFor360Video(texture);
 
-	    const hasDevice = device !== null;
+	    // eye: 0 -> left, 1 -> right
 
-	    const shadow = this.attachShadow({mode: 'open'});
+	    const geometry = mesh.geometry;
+	    geometry.scale(-1, 1, 1);
+	    const uvs = geometry.attributes.uv.array;
+	    for (let i = 0, il = uvs.length; i < il; i += 2) {
+	      if (eye === 0) {
+	        uvs[i] *= 0.5;
+	      } else {
+	        uvs[i] = uvs[i] * 0.5 + 0.5;
+	      }
+	    }
+	    mesh.layers.set(eye + 1);
 
-	    const container = document.createElement('div');
-	    container.style.position = 'relative';
-	    shadow.appendChild(container);
+	    return mesh;
+	  }
 
-	    const width = parseInt(this.getAttribute('width')) || 0;
-	    const height = parseInt(this.getAttribute('height')) || 0;
-
-	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(60, width / height);
-	    camera.position.z = 0.1;
-	    scene.add(camera);
-
-	    const crosshair = new Mesh(
+	  static createCrosshairMesh() {
+	    return new Mesh(
 	      new RingBufferGeometry(0.02, 0.04, 32),
 	      new MeshBasicMaterial( {
 	        color: 0xffffff,
@@ -49611,8 +49509,187 @@
 	        transparent: true
 	      })
 	    );
+	  }
+
+	  // @TODO: rename method name to appropriate one
+	  static setupVRModeSwitching(renderer, camera, controls, device) {
+	    const hasDevice = device !== null;
+	    const rendererSize = renderer.getSize(new Vector2());
+	    const width = rendererSize.x;
+	    const height = rendererSize.y;
+
+	    if (hasDevice) {
+	      const cameraCache = {
+	        position: camera.position.clone(),
+	        rotation: camera.rotation.clone()
+	      };
+
+	      window.addEventListener('vrdisplaypresentchange', event => {
+	        if (device.isPresenting) {
+	          renderer.vr.enabled = true;
+	          controls.enabled = false;
+	          cameraCache.position.copy(camera.position);
+	          cameraCache.rotation.copy(camera.rotation);
+	        } else {
+	          renderer.vr.enabled = false;
+	          controls.enabled = true;
+	          camera.position.copy(cameraCache.position);
+	          camera.rotation.copy(cameraCache.rotation);
+	        }
+	      }, false);
+
+	      renderer.vr.setDevice(device);
+	    } else {
+	      window.addEventListener('fullscreenchange', event => {
+	        if (document.fullscreenElement) {
+	          camera.aspect = screen.width / screen.height;
+	          camera.updateProjectionMatrix();
+	          renderer.setSize(screen.width, screen.height);
+	        } else {
+	          camera.aspect = width / height;
+	          camera.updateProjectionMatrix();
+	          renderer.setSize(width, height);
+	        }
+	      }, false);
+	    }
+	  }
+	}
+
+	class Img360 extends HTMLElement {
+	  connectedCallback() {
+	    VRHelper.getVRDevice().then(device => {
+	      this._initialize(device);
+	    });
+	  }
+
+	  _initialize(device) {
+	    const hasDevice = device !== null;
+
+
+	    // Attributes
+
+	    const src = this.getAttribute('src') || '';
+	    const width = parseInt(this.getAttribute('width')) || 0;
+	    const height = parseInt(this.getAttribute('height')) || 0;
+
+
+	    // DOM
+
+	    const shadow = this.attachShadow({mode: 'open'});
+
+	    const container = document.createElement('div');
+	    container.style.position = 'relative';
+	    shadow.appendChild(container);
+
+
+	    // Three.js renderer
+
+	    const renderer = new WebGLRenderer({antialias: true});
+	    renderer.setPixelRatio(window.devicePixelRatio);
+	    renderer.setSize(width, height);
+	    container.appendChild(renderer.domElement);
+
+
+	    // Three.js objects
+
+	    const scene = new Scene();
+	    const camera = new PerspectiveCamera(60, width / height);
+	    camera.position.z = 0.1;
+
+	    THREEHelper.create360ImageMesh(src).then(mesh => {
+	      scene.add(mesh);
+	      render();
+	    });
+
+
+	    // Three.js camera controls
+
+	    const controls = new OrbitControls(camera, renderer.domElement);
+	    controls.addEventListener('change', event => {
+	      render();
+	    });
+
+
+	    // VR / Fullscreen
+
+	    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+
+	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
+
+	    if (hasDevice) {
+	      window.addEventListener('vrdisplaypresentchange', event => {
+	        if (device.isPresenting) {
+	          renderer.setAnimationLoop(render);
+	        } else {
+	          renderer.setAnimationLoop(null);
+	        }
+
+	        render();
+	      }, false);
+	    } else {
+	      window.addEventListener('fullscreenchange', event => {
+	        render();
+	      }, false);
+	    }
+
+
+	    //
+
+	    function render() {
+	      renderer.render(scene, camera);
+	    }
+	  }
+	}
+
+	customElements.define('img-360', Img360);
+
+	class Img360Tour extends HTMLElement {
+	  connectedCallback() {
+	    VRHelper.getVRDevice().then(device => {
+	      this._initialize(device);
+	    });
+	  }
+
+	  _initialize(device) {
+
+
+	    // Attributes
+
+	    const width = parseInt(this.getAttribute('width')) || 0;
+	    const height = parseInt(this.getAttribute('height')) || 0;
+
+
+	    // DOM
+
+	    const shadow = this.attachShadow({mode: 'open'});
+
+	    const container = document.createElement('div');
+	    container.style.position = 'relative';
+	    shadow.appendChild(container);
+
+
+	    // Three.js renderer
+
+	    const renderer = new WebGLRenderer({antialias: true});
+	    renderer.setPixelRatio(window.devicePixelRatio);
+	    renderer.setSize(width, height);
+	    renderer.setAnimationLoop(render);
+	    container.appendChild(renderer.domElement);
+
+
+	    // Three.js objects
+
+	    const scene = new Scene();
+	    const camera = new PerspectiveCamera(60, width / height);
+	    camera.position.z = 0.1;
+	    scene.add(camera);
+
+	    const crosshair = THREEHelper.createCrosshairMesh();
 	    crosshair.position.z = -2;
 	    camera.add(crosshair);
+
+	    const imageMeshes = [];
+	    const targets = []; // raycast targets
 
 	    const target = new Mesh(
 	      new PlaneBufferGeometry(0.5, 0.5),
@@ -49627,133 +49704,112 @@
 	    scene.add(target);
 	    targets.push(target);
 
-	    const renderer = new WebGLRenderer({
-	      antialias: true
-	    });
-	    renderer.setPixelRatio(window.devicePixelRatio);
-	    renderer.setSize(width, height);
-	    renderer.setAnimationLoop(render);
 
-	    container.appendChild(renderer.domElement);
+	    // Child <img360> elements handling.
+	    // Traverse and add 360 image meshes.
 
-	    const controls = new OrbitControls(camera, renderer.domElement);
+	    function add360ImageMesh(element) {
+	      const src = element.getAttribute('src') || '';
 
-	    let onTargetFrames = 0;
+	      THREEHelper.create360ImageMesh(src).then(mesh => {
+	        mesh.visible = imageMeshes.length === 0;
+	        scene.add(mesh);
+	        imageMeshes.push(mesh);
+	        render();
+	      });
+	    }
 
-	    function render() {
-	      raycaster.setFromCamera({x: 0, y: 0}, camera);
-	      const intersects = raycaster.intersectObjects(targets);
-	      if (intersects.length > 0) {
-	        target.material.opacity = 0.5;
-	        onTargetFrames++;
-	        if (onTargetFrames >= 180) {
-	          moveImage();
-	          onTargetFrames = 0;
+	    function traverseImg360Elements(children) {
+	      for (let i = 0, il = children.length; i < il; i++) {
+	        const child = children[i];
+
+	        if (child.tagName === 'IMG360') {
+	          add360ImageMesh(child);
+
+	          if (child.children) {
+	            traverseImg360Elements(child.children);
+	          }
 	        }
-	      } else {
-	        target.material.opacity = 0.3;
 	      }
-	      renderer.render(scene, camera);
 	    }
 
-	    const button = document.createElement('button');
-	    button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
-	    button.style.display = '';
-	    button.style.cursor = 'pointer';
-	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
-	    button.style.width = '150px';
-	    button.style.position = 'absolute';
-	    button.style.bottom = '15px';
-	    button.style.padding = '12px 6px';
-	    button.style.border = '1px solid #fff';
-	    button.style.borderRadius = '4px';
-	    button.style.background = 'rgba(0,0,0,0.1)';
-	    button.style.color = '#fff';
-	    button.style.font = 'normal 13px sans-serif';
-	    button.style.textAlign = 'center';
-	    button.style.opacity = '0.5';
-	    button.style.outline = 'none';
-	    button.style.zIndex = '999';
-	    container.appendChild(button);
+	    traverseImg360Elements(this.children);
 
-	    button.addEventListener('mouseenter', event => {
-	      button.style.opacity = '1.0';
-	    }, false);
 
-	    button.addEventListener('mouseleave', event => {
-	      button.style.opacity = '0.5';
-	    }, false);
+	    // On Chrome, when this method is called children don't seem to be added yet.
+	    // So observing child elements addition.
 
-	    if (hasDevice) {
-	      const cameraCache = {
-	        position: camera.position.clone(),
-	        rotation: camera.rotation.clone()
-	      };
-
-	      button.addEventListener('click', event => {
-	        if (device.isPresenting) {
-	          device.exitPresent();
-	        } else {
-	          device.requestPresent([{source: renderer.domElement}]);
-	        }      }, false);
-
-	      window.addEventListener('vrdisplaypresentchange', event => {
-	        if (device.isPresenting) {
-	          button.textContent = 'EXIT VR';
-	          renderer.vr.enabled = true;
-	          controls.enabled = false;
-	          cameraCache.position.copy(camera.position);
-	          cameraCache.rotation.copy(camera.rotation);
-	        } else {
-	          button.textContent = 'ENTER VR';
-	          renderer.vr.enabled = false;
-	          controls.enabled = true;
-	          camera.position.copy(cameraCache.position);
-	          camera.rotation.copy(cameraCache.rotation);
-	          render();
-	        }
-	      }, false);
-
-	      renderer.vr.setDevice(device);
-	    } else {
-	      button.addEventListener('click', event => {
-	        {
-	          renderer.domElement.requestFullscreen();
-	        }
-	      }, false);
-
-	      window.addEventListener('fullscreenchange', event => {
-	        if (document.fullscreenElement) {
-	          camera.aspect = screen.width / screen.height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(screen.width, screen.height);
-	          render();
-	        } else {
-	          camera.aspect = width / height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(width, height);
-	          render();
-	        }
-	      }, false);
-	    }
-
-	    traverse(this.children);
-	  }
-
-	  _getVRDevice() {
-	    if (!('getVRDisplays' in navigator)) {
-	      return Promise.resolve(null);
-	    }
-
-	    return new Promise((resolve, reject) => {
-	      navigator.getVRDisplays().then(devices => {
-	        if (devices && devices.length > 0) {
-	          resolve(devices[0]);
-	        } else {
-	          resolve(null);
+	    const observer = new MutationObserver(function(mutations) {
+	      mutations.forEach(function(mutation) {
+	        if (mutation.addedNodes.length) {
+	          traverseImg360Elements(mutation.addedNodes);
 	        }
 	      });
 	    });
+
+	    observer.observe(this, {childList: true});
+
+
+	    // Raycasting.
+	    // Switches image if intersecting targets for 3seconds (180frames).
+
+	    let imageIndex = 0;
+	    let intersectingFrameCount = 0;
+	    const raycaster = new Raycaster();
+
+	    function switchImage() {
+	      imageIndex++;
+
+	      if (imageIndex >= imageMeshes.length) {
+	        imageIndex = 0;
+	      }
+
+	      for (let i = 0, il = imageMeshes.length; i < il; i++) {
+	        if (i === imageIndex) {
+	          imageMeshes[i].visible = true;
+	        } else {
+	          imageMeshes[i].visible = false;
+	        }
+	      }
+	    }
+
+	    function raycast() {
+	      raycaster.setFromCamera({x: 0, y: 0}, camera);
+	      const intersects = raycaster.intersectObjects(targets);
+
+	      if (intersects.length > 0) {
+	        target.material.opacity = 0.5;
+	        intersectingFrameCount++;
+
+	        if (intersectingFrameCount >= 180) {
+	          switchImage();
+	          intersectingFrameCount = 0;
+	        }
+	      } else {
+	        target.material.opacity = 0.3;
+	        intersectingFrameCount = 0;
+	      }
+	    }
+
+
+	    // Three.js camera controls
+
+	    const controls = new OrbitControls(camera, renderer.domElement);
+
+
+	    // VR / Fullscreen
+
+	    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+
+	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
+
+
+	    //
+
+	    function render() {
+	      raycast();
+	      renderer.render(scene, camera);
+	    }
 	  }
 	}
 
@@ -49761,13 +49817,23 @@
 
 	class Video360 extends HTMLElement {
 	  connectedCallback() {
-	    this._getVRDevice().then(device => {
+	    VRHelper.getVRDevice().then(device => {
 	      this._initialize(device);
 	    });
 	  }
 
 	  _initialize(device) {
-	    const hasDevice = device !== null;
+
+
+	    // Attributes
+
+	    const src = this.getAttribute('src') || '';
+	    const width = parseInt(this.getAttribute('width')) || 0;
+	    const height = parseInt(this.getAttribute('height')) || 0;
+	    const loop = this.getAttribute('loop') !== null;
+
+
+	    // DOM
 
 	    const shadow = this.attachShadow({mode: 'open'});
 
@@ -49775,10 +49841,24 @@
 	    container.style.position = 'relative';
 	    shadow.appendChild(container);
 
-	    const src = this.getAttribute('src') || '';
-	    const width = parseInt(this.getAttribute('width')) || 0;
-	    const height = parseInt(this.getAttribute('height')) || 0;
-	    const loop = this.getAttribute('loop') !== null;
+
+	    // Three.js renderer
+
+	    const renderer = new WebGLRenderer({
+	      antialias: true
+	    });
+	    renderer.setPixelRatio(window.devicePixelRatio);
+	    renderer.setSize(width, height);
+	    renderer.setAnimationLoop(render);
+	    container.appendChild(renderer.domElement);
+
+
+	    // Three.js objects
+
+	    const scene = new Scene();
+	    const camera = new PerspectiveCamera(60, width / height);
+	    camera.layers.enable(1);
+	    camera.position.z = 0.1;
 
 	    const video = document.createElement('video');
 	    video.src = src;
@@ -49786,169 +49866,33 @@
 	    video.muted = true;
 	    video.play().catch(error => console.error(error));
 
-	    const texture = new Texture(video);
-	    texture.generateMipmaps = false;
-	    texture.wrapS = ClampToEdgeWrapping;
-	    texture.wrapT = ClampToEdgeWrapping;
-	    texture.minFilter = NearestFilter;
-	    texture.maxFilter = NearestFilter;
+	    const texture = THREEHelper.create360VideoTexture(video);
 
-	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(75, width / height);
-	    camera.layers.enable(1);
-	    camera.position.z = 0.1;
+	    scene.add(THREEHelper.create360VideoMesh(texture, 0));
+	    scene.add(THREEHelper.create360VideoMesh(texture, 1));
 
-	    const geometry = new SphereBufferGeometry(500, 60, 40);
-	    const material = new MeshBasicMaterial({
-	      map: texture
-	    });
-	    const mesh = new Mesh(geometry, material);
 
-	    geometry.scale(-1, 1, 1);
-	    const uvs = geometry.attributes.uv.array;
-	    for (let i = 0, il = uvs.length; i < il; i += 2) {
-	      uvs[i] *= 0.5;
-	    }
-	    mesh.layers.set(1);
-
-	    scene.add(mesh);
-
-	    const geometry2 = new SphereBufferGeometry(500, 60, 40);
-	    const mesh2 = new Mesh(geometry2, material);
-
-	    geometry2.scale(-1, 1, 1);
-	    const uvs2 = geometry2.attributes.uv.array;
-	    for (let i = 0, il = uvs2.length; i < il; i += 2) {
-	      uvs2[i] = uvs2[i] * 0.5 + 0.5;
-	    }
-	    mesh2.layers.set(2);
-
-	    scene.add(mesh2);
-
-	    const renderer = new WebGLRenderer({
-	      antialias: true
-	    });
-	    renderer.setPixelRatio(window.devicePixelRatio);
-	    renderer.setSize(width, height);
-
-	    container.appendChild(renderer.domElement);
+	    // Three.js camera controls
 
 	    const controls = new OrbitControls(camera, renderer.domElement);
 
+
+	    // VR / Fullscreen
+
+	    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+
+	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
+
+
+	    //
+
 	    function render() {
-	      renderer.render(scene, camera);
-	    }
-
-	    function animate() {
-	      requestAnimationFrame(animate);
-
 	      if (video.readyState >= video.HAVE_CURRENT_DATA) {
 	        texture.needsUpdate = true;
 	      }
 
-	      render();
+	      renderer.render(scene, camera);
 	    }
-
-	    const button = document.createElement('button');
-	    button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
-	    button.style.display = '';
-	    button.style.cursor = 'pointer';
-	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
-	    button.style.width = '150px';
-	    button.style.position = 'absolute';
-	    button.style.bottom = '15px';
-	    button.style.padding = '12px 6px';
-	    button.style.border = '1px solid #fff';
-	    button.style.borderRadius = '4px';
-	    button.style.background = 'rgba(0,0,0,0.1)';
-	    button.style.color = '#fff';
-	    button.style.font = 'normal 13px sans-serif';
-	    button.style.textAlign = 'center';
-	    button.style.opacity = '0.5';
-	    button.style.outline = 'none';
-	    button.style.zIndex = '999';
-	    container.appendChild(button);
-
-	    button.addEventListener('mouseenter', event => {
-	      button.style.opacity = '1.0';
-	    }, false);
-
-	    button.addEventListener('mouseleave', event => {
-	      button.style.opacity = '0.5';
-	    }, false);
-
-	    if (hasDevice) {
-	      const cameraCache = {
-	        position: camera.position.clone(),
-	        rotation: camera.rotation.clone()
-	      };
-
-	      button.addEventListener('click', event => {
-	        if (device.isPresenting) {
-	          device.exitPresent();
-	        } else {
-	          device.requestPresent([{source: renderer.domElement}]);
-	        }      }, false);
-
-	      window.addEventListener('vrdisplaypresentchange', event => {
-	        if (device.isPresenting) {
-	          button.textContent = 'EXIT VR';
-	          renderer.vr.enabled = true;
-	          renderer.setAnimationLoop(render);
-	          controls.enabled = false;
-	          cameraCache.position.copy(camera.position);
-	          cameraCache.rotation.copy(camera.rotation);
-	        } else {
-	          button.textContent = 'ENTER VR';
-	          renderer.vr.enabled = false;
-	          renderer.setAnimationLoop(null);
-	          controls.enabled = true;
-	          camera.position.copy(cameraCache.position);
-	          camera.rotation.copy(cameraCache.rotation);
-	          render();
-	        }
-	      }, false);
-
-	      renderer.vr.setDevice(device);
-	    } else {
-	      button.addEventListener('click', event => {
-	        {
-	          renderer.domElement.requestFullscreen();
-	        }
-	      }, false);
-
-	      window.addEventListener('fullscreenchange', event => {
-	        if (document.fullscreenElement) {
-	          camera.aspect = screen.width / screen.height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(screen.width, screen.height);
-	          render();
-	        } else {
-	          camera.aspect = width / height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(width, height);
-	          render();
-	        }
-	      }, false);
-	    }
-
-	    animate();
-	  }
-
-	  _getVRDevice() {
-	    if (!('getVRDisplays' in navigator)) {
-	      return Promise.resolve(null);
-	    }
-
-	    return new Promise((resolve, reject) => {
-	      navigator.getVRDisplays().then(devices => {
-	        if (devices && devices.length > 0) {
-	          resolve(devices[0]);
-	        } else {
-	          resolve(null);
-	        }
-	      });
-	    });
 	  }
 	}
 
