@@ -2,7 +2,7 @@
 
 `immersive-custom-elements` is a set of web components. You can easily place immersive (VR) contents into your web page by just putting custom element tags.
 
-Demo(TBD) / Documentation(TBD)
+[Demo](https://raw.githack.com/MozillaReality/immersive-custom-elements/master/examples/index.html)(TBD)
 
 ## Motivation
 
