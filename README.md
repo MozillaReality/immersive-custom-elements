@@ -1,6 +1,6 @@
 # immersive-custom-elements
 
-`immersive-custom-elements` is a set of web components. You can easily place immersive (VR) contents into your web page by just putting custom element tags.
+`immersive-custom-elements` is a set of web components. You can easily embed immersive (VR) contents into your web page by just putting custom element tags.
 
 [Demo](https://raw.githack.com/MozillaReality/immersive-custom-elements/master/examples/index.html)(TBD)
 
@@ -37,6 +37,8 @@ I think there are a lot of simple use cases where they want very simple interact
 
 ### \<img-360\>
 
+Displays interactive 360 degree photo.
+
 ```javascript
 <img-360 src="imagefile.jpg" width="640" height="480"></img-360>
 ```
@@ -51,6 +53,8 @@ I think there are a lot of simple use cases where they want very simple interact
 
 ### \<video-360\>
 
+Displays interactive 360 degree video.
+
 ```javascript
 <video-360 src="video.mp4" width="640" height="480"></video>
 ```
@@ -60,10 +64,13 @@ I think there are a lot of simple use cases where they want very simple interact
 | src | strings | Path to video file |
 | width | number | element width |
 | height | number | element height |
+| loop | - | video loops if specified |
 
 ![GitHub Logo](screenshots/video-360.gif)
 
 ### \<img360-tour\>
+
+Displays a set of interactive 360 degree photos. You can switch photo by watching a white plane for three seconds.
 
 ```javascript
 <img360-tour width="640" height="480">
@@ -92,9 +99,17 @@ I think there are a lot of simple use cases where they want very simple interact
 
 You can enter immersive mode by clicking "ENTER VR" button if you have a HMD.
 
-## How to take 360 picture/video
+## 360 degree photo/video
+
+360 degree photo/video is a interactive panoramic image/video you can look around to the left, right, up, and down.
+
+You need special camera device or application to take 360 degree photo/video.
+
+### 360 degree Cameras
 
 - [RICOH THETA](https://theta360.com/)
+- [INSTA360](https://www.insta360.com/)
+- [GoPro FUSION](https://shop.gopro.com/EMEA/cameras/fusion/CHDHZ-103-master.html)
 
 ## Development
 
