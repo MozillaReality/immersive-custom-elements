@@ -61,8 +61,7 @@ class Video360 extends HTMLElement {
 
     const texture = THREEHelper.create360VideoTexture(video);
 
-    scene.add(THREEHelper.create360VideoMesh(texture, 0));
-    scene.add(THREEHelper.create360VideoMesh(texture, 1));
+    scene.add(THREEHelper.createSphereMeshFor360(texture));
 
 
     // Three.js camera controls

@@ -17,19 +17,10 @@ class THREEHelper {
     return new Mesh(
       new SphereBufferGeometry(500, 60, 40),
       new MeshBasicMaterial({
-        map: texture
+        map: texture,
+        side: BackSide
       })
     );
-  }
-
-  static createSphereMeshFor360Image(texture) {
-    const mesh = this.createSphereMeshFor360(texture);
-    mesh.material.side = BackSide;
-    return mesh;
-  }
-
-  static createSphereMeshFor360Video(video) {
-    return this.createSphereMeshFor360(video);
   }
 
   static load360ImageTexture(url) {
@@ -56,29 +47,13 @@ class THREEHelper {
   static create360ImageMesh(url) {
     return new Promise((resolve, reject) => {
       this.load360ImageTexture(url).then(texture => {
-        resolve(this.createSphereMeshFor360Image(texture));
+        resolve(this.createSphereMeshFor360(texture));
       })
     });
   }
 
-  static create360VideoMesh(texture, eye) {
-    const mesh = this.createSphereMeshFor360Video(texture);
-
-    // eye: 0 -> left, 1 -> right
-
-    const geometry = mesh.geometry;
-    geometry.scale(-1, 1, 1);
-    const uvs = geometry.attributes.uv.array;
-    for (let i = 0, il = uvs.length; i < il; i += 2) {
-      if (eye === 0) {
-        uvs[i] *= 0.5;
-      } else {
-        uvs[i] = uvs[i] * 0.5 + 0.5;
-      }
-    }
-    mesh.layers.set(eye + 1);
-
-    return mesh;
+  static create360VideoMesh(video) {
+    return this.createSphereMeshFor360(this.create360VideoTexture(video));
   }
 
   static createCrosshairMesh() {
