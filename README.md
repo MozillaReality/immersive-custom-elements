@@ -4,7 +4,7 @@ Status: In development. [Any feedback is very welcome.](https://github.com/Mozil
 
 `immersive-custom-elements` is a set of web components. You can easily embed immersive (VR) contents into your web page by just putting custom element tags.
 
-[Demo](https://raw.githack.com/MozillaReality/immersive-custom-elements/master/examples/index.html)(TBD)
+[Demo](https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/examples/index.html)
 
 ## Motivation
 
@@ -19,13 +19,15 @@ I think there are a lot of simple use cases where they want very simple interact
 
 ### Sample code
 
+Add the link to `immersive-custom-elements.js` with `\<script\>` tag. You can download the file from this repository or use the link to CDN.
+
 ```html
 <html>
   <head>
-    <script src="./build/immersive-custom-elements.js"></script>
+    <script src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/build/immersive-custom-elements.js"></script>
   </head>
   <body>
-    <img-360 src="./image.jpg" width="640" height="480"></img-360>
+    <img-360 src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/assets/img-360/landscape-3531355_1920.jpg" width="640" height="480"></img-360>
   </body>
 </html>
 ```
