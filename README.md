@@ -34,7 +34,7 @@ I think there are a lot of simple use cases where they want very simple interact
 
 - \<img-360\>
 - \<video-360\>
-- \<img360-tour\>
+- \<img-360-tour\>
 - other new elements coming later
 
 ### \<img-360\>
@@ -70,32 +70,32 @@ Displays interactive 360 degree video.
 
 ![GitHub Logo](screenshots/video-360.gif)
 
-### \<img360-tour\>
+### \<img-360-tour\>
 
 Displays a set of interactive 360 degree photos. You can switch photo by watching a white plane for three seconds.
 
 ```javascript
-<img360-tour width="640" height="480">
-  <img360 src="imagefile1.jpg"></img360>
-  <img360 src="imagefile2.jpg"></img360>
-  <img360 src="imagefile3.jpg"></img360>
-</img360-tour>
+<img-360-tour width="640" height="480">
+  <img-360-tour-item src="imagefile1.jpg"></img-360-tour-item>
+  <img-360-tour-item src="imagefile2.jpg"></img-360-tour-item>
+  <img-360-tour-item src="imagefile3.jpg"></img-360-tour-item>
+</img-360-tour-item>
 ```
 
-\<img360-tour\>
+\<img-360-tour\>
 
 | attribute | type | description |
 | ---- | ---- | ---- |
 | width | number | element width |
 | height | number | element height |
 
-\<img360\>
+\<img-360-tour-item\>
 
 | attribute | type | description |
 | ---- | ---- | ---- |
 | src | strings | Path to image file |
 
-![GitHub Logo](screenshots/image360-tour.gif)
+![GitHub Logo](screenshots/img-360-tour.gif)
 
 ## Immersive mode
 
