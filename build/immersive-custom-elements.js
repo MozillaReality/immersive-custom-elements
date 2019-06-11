@@ -49680,7 +49680,7 @@
 	    targets.push(target);
 
 
-	    // Child <img360> elements handling.
+	    // Child <img-360-tour-item> elements handling.
 	    // Traverse and add 360 image meshes.
 
 	    function add360ImageMesh(element) {
@@ -49698,7 +49698,7 @@
 	      for (let i = 0, il = children.length; i < il; i++) {
 	        const child = children[i];
 
-	        if (child.tagName === 'IMG360') {
+	        if (child.tagName === 'IMG-360-TOUR-ITEM') {
 	          add360ImageMesh(child);
 
 	          if (child.children) {
@@ -49788,7 +49788,7 @@
 	  }
 	}
 
-	customElements.define('img360-tour', Img360Tour);
+	customElements.define('img-360-tour', Img360Tour);
 
 	class Video360 extends HTMLElement {
 	  connectedCallback() {
