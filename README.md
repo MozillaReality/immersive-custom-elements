@@ -6,7 +6,7 @@ Status: In development. [Any feedback is very welcome.](https://github.com/Mozil
 
 [Demo](https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/examples/index.html)
 
-## Motivation
+## Background
 
 WebGL and WebXR(VR) have been introduced but creating immersive contents requires the knowledge of 3D graphics.
 Some tools have appeared to resolve that problem but most of them are very rich and content creators take time to learn.
