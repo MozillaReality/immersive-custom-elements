@@ -19,7 +19,7 @@ I think there are a lot of simple use cases where they want very simple interact
 
 ### Sample code
 
-Add the link to `immersive-custom-elements.js` with `\<script\>` tag. You can download the file from this repository or use the link to CDN.
+Add the link to `immersive-custom-elements.js` with `<script>` tag. You can download the file from this repository or use the link to CDN.
 
 ```html
 <html>
