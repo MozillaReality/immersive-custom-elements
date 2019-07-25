@@ -39,7 +39,7 @@ Add the link to `immersive-custom-elements.js` with `<script>` tag. You can down
 - \<img-360-tour\>
 - other new elements coming later
 
-If you have any new custom element tag ideas, come to [this thread](https://github.com/MozillaReality/immersive-custom-elements/issues/9)!
+If you have any new custom element tag ideas, join [this brainstorming thread](https://github.com/MozillaReality/immersive-custom-elements/issues/9)!
 
 ### \<img-360\>
 
