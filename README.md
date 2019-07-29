@@ -101,9 +101,11 @@ Displays a set of interactive 360 degree photos. You can switch photo by watchin
 
 ![GitHub Logo](screenshots/img-360-tour.gif)
 
-## Immersive mode
+## Immersive (VR) mode
 
 You can enter immersive mode by clicking "ENTER VR" button if you have a HMD.
+
+![GitHub Logo](screenshots/immersive.gif)
 
 ## 360 degree photo/video
 
