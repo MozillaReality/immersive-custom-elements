@@ -8,7 +8,8 @@
   "devDependencies": {
     "http-server": "^0.11.1",
     "rollup": "^1.12.3",
-    "rollup-plugin-node-resolve": "^5.0.0"
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-terser": "^5.1.1"
   },
   "dependencies": {
     "three": "^0.105.0"
