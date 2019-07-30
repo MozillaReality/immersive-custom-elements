@@ -11,7 +11,7 @@ Status: In development. [Any feedback is very welcome.](https://github.com/Mozil
 WebGL and WebXR(VR) have been introduced but creating immersive contents requires the knowledge of 3D graphics.
 Some tools have appeared to resolve that problem but most of them are very rich and content creators take time to learn.
 
-I think there are a lot of simple use cases where they want very simple interactions and they don't have the knowledge or time to create and maintain a custom application built on top of WebXR frameworks.
+We think there are a lot of simple use cases where they want very simple interactions and they don't have the knowledge or time to create and maintain a custom application built on top of WebXR frameworks.
 
 `immersive-custom-elements` provides a standard way to create HTML elements for simple functionality that matches expectations of content creators without knowledge of 3D, WebXR or even javascript.
 
