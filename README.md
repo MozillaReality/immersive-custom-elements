@@ -36,7 +36,7 @@ Add the link to `immersive-custom-elements.js` with `<script>` tag. You can down
     <script src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/build/immersive-custom-elements.js"></script>
   </head>
   <body>
-    <img-360 src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/assets/img-360/landscape-3531355_1920.jpg" width="640" height="480"></img-360>
+    <img-360 src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/assets/img-360/landscape-3531355_1920.jpg" width="640" height="360"></img-360>
   </body>
 </html>
 ```
@@ -55,7 +55,7 @@ If you have any new custom element tag ideas, join [this brainstorming thread](h
 Displays an interactive 360 degree photo.
 
 ```javascript
-<img-360 src="imagefile.jpg" width="640" height="480"></img-360>
+<img-360 src="imagefile.jpg" width="640" height="360"></img-360>
 ```
 
 | attribute | type | description |
@@ -71,7 +71,7 @@ Displays an interactive 360 degree photo.
 Displays an interactive 360 degree video.
 
 ```javascript
-<video-360 src="video.mp4" width="640" height="480"></video>
+<video-360 src="video.mp4" width="640" height="360"></video>
 ```
 
 | attribute | type | description |
@@ -89,7 +89,7 @@ Displays an interactive 360 degree video.
 Displays a set of interactive 360 degree photos. You can switch between photos by gazing at white plane for three seconds.
 
 ```javascript
-<img-360-tour width="640" height="480">
+<img-360-tour width="640" height="360">
   <img-360-tour-item src="imagefile1.jpg"></img-360-tour-item>
   <img-360-tour-item src="imagefile2.jpg"></img-360-tour-item>
   <img-360-tour-item src="imagefile3.jpg"></img-360-tour-item>
