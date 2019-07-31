@@ -7,7 +7,7 @@ your web page by using custom element tags. It currently includes components for
 
 * 360 images
 * 360 video
-* 360 image tours
+<!-- * 360 image tours -->
 
 
 [Demo](https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/examples/index.html)
@@ -45,7 +45,7 @@ Add the link to `immersive-custom-elements.js` with `<script>` tag. You can down
 
 - \<img-360\>
 - \<video-360\>
-- \<img-360-tour\>
+<!-- - \<img-360-tour\> -->
 - other new elements coming later
 
 If you have any new custom element tag ideas, join [this brainstorming thread](https://github.com/MozillaReality/immersive-custom-elements/issues/9)!
@@ -83,6 +83,7 @@ Displays an interactive 360 degree video.
 
 ![GitHub Logo](screenshots/video-360.gif)
 
+<!--
 ### \<img-360-tour\>
 
 Displays a set of interactive 360 degree photos. You can switch between photos by gazing at white plane for three seconds.
@@ -109,6 +110,7 @@ Displays a set of interactive 360 degree photos. You can switch between photos b
 | src | strings | Path to image file |
 
 ![GitHub Logo](screenshots/img-360-tour.gif)
+-->
 
 ## Immersive (VR) mode
 
