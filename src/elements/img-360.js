@@ -20,9 +20,9 @@ class Img360 extends HTMLElement {
 
     // Attributes
 
-    const src = this.getAttribute('src') || '';
-    const width = parseInt(this.getAttribute('width')) || 0;
-    const height = parseInt(this.getAttribute('height')) || 0;
+    let src = this.getAttribute('src') || '';
+    let width = parseInt(this.getAttribute('width')) || 0;
+    let height = parseInt(this.getAttribute('height')) || 0;
 
 
     // DOM
@@ -48,7 +48,10 @@ class Img360 extends HTMLElement {
     const camera = new PerspectiveCamera(60, width / height);
     camera.position.z = 0.1;
 
-    THREEHelper.create360ImageMesh(src).then(mesh => {
+    let mesh;
+
+    THREEHelper.create360ImageMesh(src).then(imageMesh => {
+      mesh = imageMesh;
       scene.add(mesh);
       render();
     });
@@ -64,7 +67,8 @@ class Img360 extends HTMLElement {
 
     // VR / Fullscreen
 
-    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+    const button = VRHelper.createButton(renderer.domElement, device);
+    container.appendChild(button);
 
     THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
 
@@ -85,7 +89,40 @@ class Img360 extends HTMLElement {
     }
 
 
-    //
+    // dynamic attributes change
+
+    const observer = new MutationObserver(mutations => {
+      const newSrc = this.getAttribute('src') || '';
+      const newWidth = parseInt(this.getAttribute('width')) || 0;
+      const newHeight = parseInt(this.getAttribute('height')) || 0;
+
+      if (newWidth !== width || newHeight !== height) {
+        width = newWidth;
+        height = newHeight;
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(width, height);
+
+        VRHelper.updateButton(renderer.domElement, button);
+
+        render();
+      }
+
+      if (newSrc !== src) {
+        src = newSrc;
+        THREEHelper.load360ImageTexture(src).then(texture => {
+          mesh.material.map.dispose();
+          mesh.material.map = texture;
+          render();
+        });
+      }
+    });
+
+    observer.observe(this, {
+      attributes: true
+    });
 
     function render() {
       renderer.render(scene, camera);

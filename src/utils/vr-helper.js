@@ -61,6 +61,11 @@
     return button;
   }
 
+  static updateButton(canvas, button) {
+    const width = parseInt(canvas.style.width) || canvas.width;
+    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
+  }
+
   static getVRDevice() {
     if (!('getVRDisplays' in navigator)) {
       return Promise.resolve(null);
