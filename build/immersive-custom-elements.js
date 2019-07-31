@@ -49420,6 +49420,11 @@
 	    return button;
 	  }
 
+	  static updateButton(canvas, button) {
+	    const width = parseInt(canvas.style.width) || canvas.width;
+	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
+	  }
+
 	  static getVRDevice() {
 	    if (!('getVRDisplays' in navigator)) {
 	      return Promise.resolve(null);
@@ -49549,9 +49554,9 @@
 
 	    // Attributes
 
-	    const src = this.getAttribute('src') || '';
-	    const width = parseInt(this.getAttribute('width')) || 0;
-	    const height = parseInt(this.getAttribute('height')) || 0;
+	    let src = this.getAttribute('src') || '';
+	    let width = parseInt(this.getAttribute('width')) || 0;
+	    let height = parseInt(this.getAttribute('height')) || 0;
 
 
 	    // DOM
@@ -49574,10 +49579,13 @@
 	    // Three.js objects
 
 	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(60, width / height);
+	    const camera = new PerspectiveCamera(90, width / height);
 	    camera.position.z = 0.1;
 
-	    THREEHelper.create360ImageMesh(src).then(mesh => {
+	    let mesh;
+
+	    THREEHelper.create360ImageMesh(src).then(imageMesh => {
+	      mesh = imageMesh;
 	      scene.add(mesh);
 	      render();
 	    });
@@ -49593,7 +49601,8 @@
 
 	    // VR / Fullscreen
 
-	    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+	    const button = VRHelper.createButton(renderer.domElement, device);
+	    container.appendChild(button);
 
 	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
 
@@ -49614,7 +49623,40 @@
 	    }
 
 
-	    //
+	    // dynamic attributes change
+
+	    const observer = new MutationObserver(mutations => {
+	      const newSrc = this.getAttribute('src') || '';
+	      const newWidth = parseInt(this.getAttribute('width')) || 0;
+	      const newHeight = parseInt(this.getAttribute('height')) || 0;
+
+	      if (newWidth !== width || newHeight !== height) {
+	        width = newWidth;
+	        height = newHeight;
+
+	        camera.aspect = width / height;
+	        camera.updateProjectionMatrix();
+
+	        renderer.setSize(width, height);
+
+	        VRHelper.updateButton(renderer.domElement, button);
+
+	        render();
+	      }
+
+	      if (newSrc !== src) {
+	        src = newSrc;
+	        THREEHelper.load360ImageTexture(src).then(texture => {
+	          mesh.material.map.dispose();
+	          mesh.material.map = texture;
+	          render();
+	        });
+	      }
+	    });
+
+	    observer.observe(this, {
+	      attributes: true
+	    });
 
 	    function render() {
 	      renderer.render(scene, camera);
@@ -49661,7 +49703,7 @@
 	    // Three.js objects
 
 	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(60, width / height);
+	    const camera = new PerspectiveCamera(90, width / height);
 	    camera.position.z = 0.1;
 	    scene.add(camera);
 
@@ -49808,10 +49850,10 @@
 
 	    // Attributes
 
-	    const src = this.getAttribute('src') || '';
-	    const width = parseInt(this.getAttribute('width')) || 0;
-	    const height = parseInt(this.getAttribute('height')) || 0;
-	    const loop = this.getAttribute('loop') !== null;
+	    let src = this.getAttribute('src') || '';
+	    let width = parseInt(this.getAttribute('width')) || 0;
+	    let height = parseInt(this.getAttribute('height')) || 0;
+	    let loop = this.getAttribute('loop') !== null;
 
 
 	    // DOM
@@ -49837,7 +49879,7 @@
 	    // Three.js objects
 
 	    const scene = new Scene();
-	    const camera = new PerspectiveCamera(60, width / height);
+	    const camera = new PerspectiveCamera(90, width / height);
 	    camera.layers.enable(1);
 	    camera.position.z = 0.1;
 
@@ -49859,9 +49901,47 @@
 
 	    // VR / Fullscreen
 
-	    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+	    const button = VRHelper.createButton(renderer.domElement, device);
+	    container.appendChild(button);
 
 	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
+
+
+	    // dynamic attributes change
+
+	    const observer = new MutationObserver(mutations => {
+	      const newSrc = this.getAttribute('src') || '';
+	      const newWidth = parseInt(this.getAttribute('width')) || 0;
+	      const newHeight = parseInt(this.getAttribute('height')) || 0;
+	      const newLoop = this.getAttribute('loop') !== null;
+
+	      if (newWidth !== width || newHeight !== height) {
+	        width = newWidth;
+	        height = newHeight;
+
+	        camera.aspect = width / height;
+	        camera.updateProjectionMatrix();
+
+	        renderer.setSize(width, height);
+
+	        VRHelper.updateButton(renderer.domElement, button);
+	      }
+
+	      if (newSrc !== src) {
+	        src = newSrc;
+	        video.src = src;
+	        video.play().catch(error => console.error(error));
+	      }
+
+	      if (newLoop !== loop) {
+	        loop = newLoop;
+	        video.loop = loop;
+	      }
+	    });
+
+	    observer.observe(this, {
+	      attributes: true
+	    });
 
 
 	    //
