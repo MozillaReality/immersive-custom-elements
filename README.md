@@ -17,7 +17,7 @@ your web page by using custom element tags. It currently includes components for
 Creating immersive content directly with WebGL and WebXR(VR) requires deep knowledge of 3D graphics.
 Tools which address this problem tend to be very rich and take time to learn.
 
-We think there are a lot of simple use cases where where content creators want very simple 
+We think there are a lot of simple use cases where content creators want very simple 
 interactions but they don't have the knowledge or time to create and maintain a custom application 
 built on top of WebXR frameworks.
 
