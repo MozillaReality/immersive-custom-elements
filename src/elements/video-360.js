@@ -20,10 +20,10 @@ class Video360 extends HTMLElement {
 
     // Attributes
 
-    const src = this.getAttribute('src') || '';
-    const width = parseInt(this.getAttribute('width')) || 0;
-    const height = parseInt(this.getAttribute('height')) || 0;
-    const loop = this.getAttribute('loop') !== null;
+    let src = this.getAttribute('src') || '';
+    let width = parseInt(this.getAttribute('width')) || 0;
+    let height = parseInt(this.getAttribute('height')) || 0;
+    let loop = this.getAttribute('loop') !== null;
 
 
     // DOM
@@ -71,9 +71,47 @@ class Video360 extends HTMLElement {
 
     // VR / Fullscreen
 
-    container.appendChild(VRHelper.createButton(renderer.domElement, device));
+    const button = VRHelper.createButton(renderer.domElement, device);
+    container.appendChild(button);
 
     THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
+
+
+    // dynamic attributes change
+
+    const observer = new MutationObserver(mutations => {
+      const newSrc = this.getAttribute('src') || '';
+      const newWidth = parseInt(this.getAttribute('width')) || 0;
+      const newHeight = parseInt(this.getAttribute('height')) || 0;
+      const newLoop = this.getAttribute('loop') !== null;
+
+      if (newWidth !== width || newHeight !== height) {
+        width = newWidth;
+        height = newHeight;
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(width, height);
+
+        VRHelper.updateButton(renderer.domElement, button);
+      }
+
+      if (newSrc !== src) {
+        src = newSrc;
+        video.src = src;
+        video.play().catch(error => console.error(error));
+      }
+
+      if (newLoop !== loop) {
+        loop = newLoop;
+        video.loop = loop;
+      }
+    });
+
+    observer.observe(this, {
+      attributes: true
+    });
 
 
     //
