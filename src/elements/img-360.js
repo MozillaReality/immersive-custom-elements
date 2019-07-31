@@ -45,7 +45,7 @@ class Img360 extends HTMLElement {
     // Three.js objects
 
     const scene = new Scene();
-    const camera = new PerspectiveCamera(60, width / height);
+    const camera = new PerspectiveCamera(90, width / height);
     camera.position.z = 0.1;
 
     let mesh;

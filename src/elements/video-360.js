@@ -49,7 +49,7 @@ class Video360 extends HTMLElement {
     // Three.js objects
 
     const scene = new Scene();
-    const camera = new PerspectiveCamera(60, width / height);
+    const camera = new PerspectiveCamera(90, width / height);
     camera.layers.enable(1);
     camera.position.z = 0.1;
 

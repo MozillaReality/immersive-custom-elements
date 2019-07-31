@@ -49,7 +49,7 @@ class Img360Tour extends HTMLElement {
     // Three.js objects
 
     const scene = new Scene();
-    const camera = new PerspectiveCamera(60, width / height);
+    const camera = new PerspectiveCamera(90, width / height);
     camera.position.z = 0.1;
     scene.add(camera);
 
