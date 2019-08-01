@@ -130,6 +130,15 @@ You will need a special camera or application to take 360 degree photos and vide
 - [INSTA360](https://www.insta360.com/)
 - [GoPro FUSION](https://shop.gopro.com/EMEA/cameras/fusion/CHDHZ-103-master.html)
 
+## Browsers and headsets
+
+Currently we test this project on the following platforms.
+
+- Firefox/Chrome on Desktop
+- Firefox Reality/Oculus Browser on Oculus Go/Quest
+
+[Feedback from other platforms are very welcome.](https://github.com/MozillaReality/immersive-custom-elements/issues)
+
 ## Development
 
 ### How to build
