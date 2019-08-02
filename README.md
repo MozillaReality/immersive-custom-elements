@@ -134,7 +134,7 @@ You will need a special camera or application to take 360 degree photos and vide
 
 ## Browsers and headsets
 
-Currently we test this project on the following platforms.
+Currently we test this project on the latest version of the following platforms.
 
 - Firefox/Chrome on Desktop
 - Firefox Reality/Oculus Browser on Oculus Go/Quest
