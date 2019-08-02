@@ -68,7 +68,7 @@ Displays an interactive 360 degree photo.
 
 ### \<video-360\>
 
-Displays an interactive 360 degree video.
+Plays an interactive 360 degree video. Click video to start playing.
 
 ```javascript
 <video-360 src="video.mp4" width="640" height="360"></video>
@@ -79,7 +79,9 @@ Displays an interactive 360 degree video.
 | src | strings | Path to video file |
 | width | number | element width |
 | height | number | element height |
-| loop | - | video loops if specified |
+| loop | - | video loops if defined |
+| muted | - | the audio output of the video is muted if defined |
+| autoplay | - | video automatically starts playing if defined |
 
 ![GitHub Logo](screenshots/video-360.gif)
 

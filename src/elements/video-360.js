@@ -17,13 +17,14 @@ class Video360 extends HTMLElement {
   _initialize(device) {
     const hasDevice = device !== null;
 
-
     // Attributes
 
     let src = this.getAttribute('src') || '';
     let width = parseInt(this.getAttribute('width')) || 0;
     let height = parseInt(this.getAttribute('height')) || 0;
     let loop = this.getAttribute('loop') !== null;
+    let muted = this.getAttribute('muted') !== null;
+    let autoplay = this.getAttribute('autoplay') !== null;
 
 
     // DOM
@@ -46,18 +47,45 @@ class Video360 extends HTMLElement {
     container.appendChild(renderer.domElement);
 
 
+    // video element
+
+    let readyToStart = false;
+    let triggered = autoplay;
+
+    const video = document.createElement('video');
+    video.src = src;
+    video.loop = loop;
+    video.muted = muted;
+
+    video.addEventListener('canplaythrough', event => {
+      readyToStart = true;
+      play();
+    });
+
+    renderer.domElement.addEventListener('click', event => {
+      triggered = true;
+      play();
+    }, false);
+
+    renderer.domElement.addEventListener('touchend', event => {
+      triggered = true;
+      play();
+    }, false);
+
+    function play() {
+      if (!readyToStart || !triggered || !video.paused) return;
+
+      // @TODO: proper error handling
+      video.play().catch(error => console.error(error.message));
+    }
+
+
     // Three.js objects
 
     const scene = new Scene();
     const camera = new PerspectiveCamera(90, width / height);
     camera.layers.enable(1);
     camera.position.z = 0.1;
-
-    const video = document.createElement('video');
-    video.src = src;
-    video.loop = loop;
-    video.muted = true;
-    video.play().catch(error => console.error(error));
 
     const texture = THREEHelper.create360VideoTexture(video);
 
@@ -76,6 +104,15 @@ class Video360 extends HTMLElement {
 
     THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
 
+    window.addEventListener('vrdisplaypresentchange', event => {
+      triggered = true;
+      play();
+    }, false);
+
+    document.addEventListener('fullscreenchange', event => {
+      triggered = true;
+      play();
+    }, false);
 
     // dynamic attributes change
 
@@ -84,6 +121,8 @@ class Video360 extends HTMLElement {
       const newWidth = parseInt(this.getAttribute('width')) || 0;
       const newHeight = parseInt(this.getAttribute('height')) || 0;
       const newLoop = this.getAttribute('loop') !== null;
+      const newMuted = this.getAttribute('muted') !== null;
+      const newAutoplay = this.getAttribute('autoplay') !== null;
 
       if (newWidth !== width || newHeight !== height) {
         width = newWidth;
@@ -97,15 +136,24 @@ class Video360 extends HTMLElement {
         VRHelper.updateButton(renderer.domElement, button);
       }
 
-      if (newSrc !== src) {
-        src = newSrc;
-        video.src = src;
-        video.play().catch(error => console.error(error));
-      }
-
       if (newLoop !== loop) {
         loop = newLoop;
         video.loop = loop;
+      }
+
+      if (newMuted !== muted) {
+        muted = newMuted;
+        video.muted = muted;
+      }
+
+      if (newAutoplay !== autoplay) {
+        autoplay = newAutoplay;
+      }
+
+      if (newSrc !== src) {
+        src = newSrc;
+        video.src = src;
+        readyToStart = false;
       }
     });
 
