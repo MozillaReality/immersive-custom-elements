@@ -122,7 +122,7 @@ You can enter immersive mode by clicking "ENTER VR" button if you have a HMD.
 
 ## 360 degree photo/video
 
-360 degree photo/video is a interactive panoramic image/video.
+360 degree photo/video is an interactive panoramic image/video.
 
 You will need a special camera or application to take 360 degree photos and videos.
 
