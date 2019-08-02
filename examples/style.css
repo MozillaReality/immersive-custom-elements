@@ -1,0 +1,17 @@
+body {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin: 0em 1em 0em 1em;
+}
+
+img-360, video-360 {
+  margin: 0em auto 1em auto;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+div, h1, h2, pre {
+  margin: 0em auto 1em auto;
+}
