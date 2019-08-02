@@ -2,7 +2,7 @@ body {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  margin: 0em 1em 0em 1em;
+  margin: 1em;
 }
 
 img-360, video-360 {
