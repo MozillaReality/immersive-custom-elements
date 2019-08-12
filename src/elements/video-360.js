@@ -43,7 +43,13 @@ class Video360 extends HTMLElement {
     });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
-    renderer.setAnimationLoop(render);
+    renderer.setAnimationLoop(() => {
+      if (video.readyState >= video.HAVE_CURRENT_DATA) {
+        texture.needsUpdate = true;
+      }
+
+      renderer.render(scene, camera);
+    });
     container.appendChild(renderer.domElement);
 
 
@@ -72,12 +78,12 @@ class Video360 extends HTMLElement {
       play();
     }, false);
 
-    function play() {
+    const play = () => {
       if (!readyToStart || !triggered || !video.paused) return;
 
       // @TODO: proper error handling
       video.play().catch(error => console.error(error.message));
-    }
+    };
 
 
     // Three.js objects
@@ -160,17 +166,6 @@ class Video360 extends HTMLElement {
     observer.observe(this, {
       attributes: true
     });
-
-
-    //
-
-    function render() {
-      if (video.readyState >= video.HAVE_CURRENT_DATA) {
-        texture.needsUpdate = true;
-      }
-
-      renderer.render(scene, camera);
-    }
   }
 }
 

@@ -77,7 +77,7 @@ class Img360Tour extends HTMLElement {
     // Child <img-360-tour-item> elements handling.
     // Traverse and add 360 image meshes.
 
-    function add360ImageMesh(element) {
+    const add360ImageMesh = (element) => {
       const src = element.getAttribute('src') || '';
 
       THREEHelper.create360ImageMesh(src).then(mesh => {
@@ -86,9 +86,9 @@ class Img360Tour extends HTMLElement {
         imageMeshes.push(mesh);
         render();
       });
-    }
+    };
 
-    function traverseImg360Elements(children) {
+    const traverseImg360Elements = (children) => {
       for (let i = 0, il = children.length; i < il; i++) {
         const child = children[i];
 
@@ -100,7 +100,7 @@ class Img360Tour extends HTMLElement {
           }
         }
       }
-    }
+    };
 
     traverseImg360Elements(this.children);
 
@@ -108,8 +108,8 @@ class Img360Tour extends HTMLElement {
     // On Chrome, when this method is called children don't seem to be added yet.
     // So observing child elements addition.
 
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.addedNodes.length) {
           traverseImg360Elements(mutation.addedNodes);
         }
@@ -126,7 +126,7 @@ class Img360Tour extends HTMLElement {
     let intersectingFrameCount = 0;
     const raycaster = new Raycaster();
 
-    function switchImage() {
+    const switchImage = () => {
       imageIndex++;
 
       if (imageIndex >= imageMeshes.length) {
@@ -140,9 +140,9 @@ class Img360Tour extends HTMLElement {
           imageMeshes[i].visible = false;
         }
       }
-    }
+    };
 
-    function raycast() {
+    const raycast = () => {
       raycaster.setFromCamera({x: 0, y: 0}, camera);
       const intersects = raycaster.intersectObjects(targets);
 
@@ -158,7 +158,7 @@ class Img360Tour extends HTMLElement {
         target.material.opacity = 0.3;
         intersectingFrameCount = 0;
       }
-    }
+    };
 
 
     // Three.js camera controls
@@ -175,10 +175,10 @@ class Img360Tour extends HTMLElement {
 
     //
 
-    function render() {
+    const render = () => {
       raycast();
       renderer.render(scene, camera);
-    }
+    };
   }
 }
 
