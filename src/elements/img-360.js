@@ -124,9 +124,9 @@ class Img360 extends HTMLElement {
       attributes: true
     });
 
-    function render() {
+    const render = () => {
       renderer.render(scene, camera);
-    }
+    };
   }
 }
 
