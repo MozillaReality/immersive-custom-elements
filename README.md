@@ -8,7 +8,8 @@ your web page by using custom element tags. It currently includes components for
 <!-- * 360 image tours -->
 
 
-[Demo](https://mixedreality.mozilla.org/immersive-custom-elements/examples/index.html)
+[Demo](https://mixedreality.mozilla.org/immersive-custom-elements/examples/index.html) / 
+[Blog post](https://blog.mozvr.com/custom-elements-for-the-immersive-web/)
 
 ## Usage
 
