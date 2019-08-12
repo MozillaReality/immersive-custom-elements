@@ -40,11 +40,11 @@ Displays an interactive 360 degree photo.
 <img-360 src="imagefile.jpg" width="640" height="360"></img-360>
 ```
 
-| attribute | type | description |
-| ---- | ---- | ---- |
-| src | strings | Path to image file |
-| width | number | element width |
-| height | number | element height |
+| attribute | type | required | description |
+| ---- | ---- | ---- | ---- |
+| src | strings | yes | Path to image file |
+| width | number | yes | element width |
+| height | number | yes | element height |
 
 ![GitHub Logo](screenshots/img-360.gif)
 
@@ -56,14 +56,14 @@ Plays an interactive 360 degree video. Click video to start playing.
 <video-360 src="video.mp4" width="640" height="360"></video>
 ```
 
-| attribute | type | description |
-| ---- | ---- | ---- |
-| src | strings | Path to video file |
-| width | number | element width |
-| height | number | element height |
-| loop | - | video loops if defined |
-| muted | - | the audio output of the video is muted if defined |
-| autoplay | - | video automatically starts playing if defined |
+| attribute | type | required | description |
+| ---- | ---- | ---- | ---- |
+| src | strings | yes | Path to video file |
+| width | number | yes | element width |
+| height | number | yes | element height |
+| loop | - | no | video loops if defined |
+| muted | - | no | the audio output of the video is muted if defined |
+| autoplay | - | no | video automatically starts playing if defined |
 
 ![GitHub Logo](screenshots/video-360.gif)
 
