@@ -8,7 +8,7 @@ your web page by using custom element tags. It currently includes components for
 <!-- * 360 image tours -->
 
 
-[Demo](https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/examples/index.html)
+[Demo](https://mixedreality.mozilla.org/immersive-custom-elements/examples/index.html)
 
 ## Usage
 
