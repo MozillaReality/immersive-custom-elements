@@ -54,7 +54,7 @@ Displays an interactive 360 degree photo.
 Plays an interactive 360 degree video. Click video to start playing.
 
 ```javascript
-<video-360 src="video.mp4" width="640" height="360"></video>
+<video-360 src="video.mp4" width="640" height="360" loop></video>
 ```
 
 | attribute | type | required | description |
