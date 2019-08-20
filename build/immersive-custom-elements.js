@@ -49658,9 +49658,9 @@
 	      attributes: true
 	    });
 
-	    function render() {
+	    const render = () => {
 	      renderer.render(scene, camera);
-	    }
+	    };
 	  }
 	}
 
@@ -49701,7 +49701,13 @@
 	    });
 	    renderer.setPixelRatio(window.devicePixelRatio);
 	    renderer.setSize(width, height);
-	    renderer.setAnimationLoop(render);
+	    renderer.setAnimationLoop(() => {
+	      if (video.readyState >= video.HAVE_CURRENT_DATA) {
+	        texture.needsUpdate = true;
+	      }
+
+	      renderer.render(scene, camera);
+	    });
 	    container.appendChild(renderer.domElement);
 
 
@@ -49711,9 +49717,6 @@
 	    let triggered = autoplay;
 
 	    const video = document.createElement('video');
-	    video.src = src;
-	    video.loop = loop;
-	    video.muted = muted;
 
 	    video.addEventListener('canplaythrough', event => {
 	      readyToStart = true;
@@ -49730,13 +49733,20 @@
 	      play();
 	    }, false);
 
-	    function play() {
+	    const play = () => {
 	      if (!readyToStart || !triggered || !video.paused) return;
 
 	      // @TODO: proper error handling
 	      video.play().catch(error => console.error(error.message));
-	    }
+	    };
 
+	    video.src = src;
+	    video.loop = loop;
+	    video.muted = muted;
+
+	    // Seems like explicit video.load() call is needed
+	    // for some (mobile?) platforms.
+	    video.load();
 
 	    // Three.js objects
 
@@ -49812,23 +49822,13 @@
 	        src = newSrc;
 	        video.src = src;
 	        readyToStart = false;
+	        video.load();
 	      }
 	    });
 
 	    observer.observe(this, {
 	      attributes: true
 	    });
-
-
-	    //
-
-	    function render() {
-	      if (video.readyState >= video.HAVE_CURRENT_DATA) {
-	        texture.needsUpdate = true;
-	      }
-
-	      renderer.render(scene, camera);
-	    }
 	  }
 	}
 
