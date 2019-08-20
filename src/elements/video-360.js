@@ -59,9 +59,6 @@ class Video360 extends HTMLElement {
     let triggered = autoplay;
 
     const video = document.createElement('video');
-    video.src = src;
-    video.loop = loop;
-    video.muted = muted;
 
     video.addEventListener('canplaythrough', event => {
       readyToStart = true;
@@ -85,6 +82,13 @@ class Video360 extends HTMLElement {
       video.play().catch(error => console.error(error.message));
     };
 
+    video.src = src;
+    video.loop = loop;
+    video.muted = muted;
+
+    // Seems like explicit video.load() call is needed
+    // for some (mobile?) platforms.
+    video.load();
 
     // Three.js objects
 
@@ -160,6 +164,7 @@ class Video360 extends HTMLElement {
         src = newSrc;
         video.src = src;
         readyToStart = false;
+        video.load();
       }
     });
 
