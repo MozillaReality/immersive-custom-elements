@@ -3,18 +3,24 @@
   Scene,
   WebGLRenderer
 } from 'three';
+import {DeviceOrientationControls} from 'three/examples/jsm/controls/DeviceOrientationControls';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
-import {VRHelper} from '../utils/vr-helper';
+import {
+  DeviceOrientationHelper
+} from '../utils/deviceorientation-helper';import {VRHelper} from '../utils/vr-helper';
 import {THREEHelper} from '../utils/three-helper';
 
 class Video360 extends HTMLElement {
   connectedCallback() {
-    VRHelper.getVRDevice().then(device => {
-      this._initialize(device);
+    Promise.all([
+      VRHelper.getVRDevice(),
+      DeviceOrientationHelper.hasDeviceOrientation()
+    ]).then(array => {
+      this._initialize(array[0], array[1]);
     });
   }
 
-  _initialize(device) {
+  _initialize(device, hasDeviceOrientation) {
     const hasDevice = device !== null;
 
     // Attributes
@@ -46,6 +52,10 @@ class Video360 extends HTMLElement {
     renderer.setAnimationLoop(() => {
       if (video.readyState >= video.HAVE_CURRENT_DATA) {
         texture.needsUpdate = true;
+      }
+
+      if (hasDeviceOrientation && controls.enabled) {
+        controls.update();
       }
 
       renderer.render(scene, camera);
@@ -104,7 +114,9 @@ class Video360 extends HTMLElement {
 
     // Three.js camera controls
 
-    const controls = new OrbitControls(camera, renderer.domElement);
+    const controls = hasDeviceOrientation
+      ? new DeviceOrientationControls(camera)
+      : new OrbitControls(camera, renderer.domElement);
 
 
     // VR / Fullscreen
