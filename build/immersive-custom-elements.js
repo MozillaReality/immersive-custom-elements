@@ -49358,6 +49358,191 @@
 
 	} );
 
+	/**
+	 * @author richt / http://richt.me
+	 * @author WestLangley / http://github.com/WestLangley
+	 *
+	 * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
+	 */
+
+	var DeviceOrientationControls = function ( object ) {
+
+		var scope = this;
+
+		this.object = object;
+		this.object.rotation.reorder( 'YXZ' );
+
+		this.enabled = true;
+
+		this.deviceOrientation = {};
+		this.screenOrientation = 0;
+
+		this.alphaOffset = 0; // radians
+
+		var onDeviceOrientationChangeEvent = function ( event ) {
+
+			scope.deviceOrientation = event;
+
+		};
+
+		var onScreenOrientationChangeEvent = function () {
+
+			scope.screenOrientation = window.orientation || 0;
+
+		};
+
+		// The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
+
+		var setObjectQuaternion = function () {
+
+			var zee = new Vector3( 0, 0, 1 );
+
+			var euler = new Euler();
+
+			var q0 = new Quaternion();
+
+			var q1 = new Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+
+			return function ( quaternion, alpha, beta, gamma, orient ) {
+
+				euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
+
+				quaternion.setFromEuler( euler ); // orient the device
+
+				quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
+
+				quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
+
+			};
+
+		}();
+
+		this.connect = function () {
+
+			onScreenOrientationChangeEvent(); // run once on load
+
+			window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+			window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+			scope.enabled = true;
+
+		};
+
+		this.disconnect = function () {
+
+			window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+			window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+			scope.enabled = false;
+
+		};
+
+		this.update = function () {
+
+			if ( scope.enabled === false ) return;
+
+			var device = scope.deviceOrientation;
+
+			if ( device ) {
+
+				var alpha = device.alpha ? _Math.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
+
+				var beta = device.beta ? _Math.degToRad( device.beta ) : 0; // X'
+
+				var gamma = device.gamma ? _Math.degToRad( device.gamma ) : 0; // Y''
+
+				var orient = scope.screenOrientation ? _Math.degToRad( scope.screenOrientation ) : 0; // O
+
+				setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+
+			}
+
+
+		};
+
+		this.dispose = function () {
+
+			scope.disconnect();
+
+		};
+
+		this.connect();
+
+	};
+
+	class DeviceOrientationControlsWrapper extends EventDispatcher {
+	  constructor(camera) {
+	    super();
+
+	    this.controls = new DeviceOrientationControls(camera);
+	    this.prohibiting = false;
+
+	    const onChange = (event) => {
+	      if (!this.controls.enabled || this.prohibiting) return;
+	      this.controls.update();
+	      this.dispatchEvent({type: 'change'});
+
+	      // Ignoring the event in the same animation frame.
+	      // because this event is fired too often.
+	      this.prohibiting = true;
+	      requestAnimationFrame(() => { this.prohibiting = false; });
+	    };
+
+	    window.addEventListener('orientationchange', onChange, false);
+	    window.addEventListener('deviceorientation', onChange, false);
+	  }
+
+	  get enabled() {
+	    return this.controls.enabled;
+	  }
+
+	  set enabled(enabled) {
+	    this.controls.enabled = enabled;
+	  }
+	}
+
+	class DeviceOrientationHelper {
+	  static hasDeviceOrientation() {
+	    return new Promise((resolve) => {
+	      let detecting = true;
+
+	      const onOrientationChange = () => {
+	        if (detecting) {
+	          detecting = false;
+	          removeEventListeners();
+	          resolve(true);
+	        }
+	      };
+
+	      const onDeviceOrientation = (event) => {
+	        if (detecting) {
+	          detecting = false;
+	          removeEventListeners();
+	          resolve(event.alpha === null ? false : true);
+	        }
+	      };
+
+	      const removeEventListeners = () => {
+	        window.removeEventListener('orientationchange', onOrientationChange, false);
+	        window.removeEventListener('deviceorientation', onDeviceOrientation, false);
+	      };
+
+	      window.addEventListener('orientationchange', onOrientationChange, false);
+	      window.addEventListener('deviceorientation', onDeviceOrientation, false);
+
+	      // Determining device orientation isn't supported if
+	      // orientation event isn't called in 100ms.
+	      setTimeout(() => {
+	        if (detecting) {
+	          detecting = false;
+	          removeEventListeners();
+	          resolve(false);
+	        }
+	      }, 100);
+	    });
+	  }
+	}
+
 	class VRHelper {
 	  static createButton(canvas, device) {
 	    // Assumes canvas.style.width has 'zzzpx'
@@ -49543,12 +49728,15 @@
 
 	class Img360 extends HTMLElement {
 	  connectedCallback() {
-	    VRHelper.getVRDevice().then(device => {
-	      this._initialize(device);
+	    Promise.all([
+	      VRHelper.getVRDevice(),
+	      DeviceOrientationHelper.hasDeviceOrientation()
+	    ]).then(array => {
+	      this._initialize(array[0], array[1]);
 	    });
 	  }
 
-	  _initialize(device) {
+	  _initialize(device, hasDeviceOrientation) {
 	    const hasDevice = device !== null;
 
 
@@ -49593,11 +49781,12 @@
 
 	    // Three.js camera controls
 
-	    const controls = new OrbitControls(camera, renderer.domElement);
+	    const controls = hasDeviceOrientation
+	      ? new DeviceOrientationControlsWrapper(camera)
+	      : new OrbitControls(camera, renderer.domElement);
 	    controls.addEventListener('change', event => {
 	      render();
 	    });
-
 
 	    // VR / Fullscreen
 
@@ -49668,12 +49857,15 @@
 
 	class Video360 extends HTMLElement {
 	  connectedCallback() {
-	    VRHelper.getVRDevice().then(device => {
-	      this._initialize(device);
+	    Promise.all([
+	      VRHelper.getVRDevice(),
+	      DeviceOrientationHelper.hasDeviceOrientation()
+	    ]).then(array => {
+	      this._initialize(array[0], array[1]);
 	    });
 	  }
 
-	  _initialize(device) {
+	  _initialize(device, hasDeviceOrientation) {
 
 	    // Attributes
 
@@ -49704,6 +49896,10 @@
 	    renderer.setAnimationLoop(() => {
 	      if (video.readyState >= video.HAVE_CURRENT_DATA) {
 	        texture.needsUpdate = true;
+	      }
+
+	      if (hasDeviceOrientation && controls.enabled) {
+	        controls.update();
 	      }
 
 	      renderer.render(scene, camera);
@@ -49762,7 +49958,9 @@
 
 	    // Three.js camera controls
 
-	    const controls = new OrbitControls(camera, renderer.domElement);
+	    const controls = hasDeviceOrientation
+	      ? new DeviceOrientationControls(camera)
+	      : new OrbitControls(camera, renderer.domElement);
 
 
 	    // VR / Fullscreen
