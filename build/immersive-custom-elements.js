@@ -49925,7 +49925,11 @@
 	      VRHelper.getVRDevice(),
 	      DeviceOrientationHelper.hasDeviceOrientation()
 	    ]).then(array => {
-	      this._initialize(array[0], array[1]);
+	      try {
+	        this._initialize(array[0], array[1]);
+	      } catch (error) {
+	        window.alert(error.message);
+	      }
 	    });
 	  }
 
