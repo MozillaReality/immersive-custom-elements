@@ -65,7 +65,7 @@
     if (element.fullscreenEnabled !== undefined) {
       return element.fullscreenEnabled;
     }
-    if (element.webkitFullscreenEnabld !== undefined) {
+    if (element.webkitFullscreenEnabled !== undefined) {
       return element.webkitFullscreenEnabled;
     }
     if (element.mozFullScreenEnabled !== undefined) {
