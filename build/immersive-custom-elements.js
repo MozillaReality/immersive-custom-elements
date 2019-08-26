@@ -49994,6 +49994,9 @@
 	    }, false);
 
 	    const play = () => {
+	      window.alert('readyToStart:' + readyToStart);
+	      window.alert('triggered:' + triggered);
+	      window.alert('paused:' + video.paused);
 	      if (!readyToStart || !triggered || !video.paused) return;
 
 	      // @TODO: proper error handling
