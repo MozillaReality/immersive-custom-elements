@@ -50092,6 +50092,7 @@
 	        video.src = src;
 	        readyToStart = false;
 	        video.load();
+	        window.alert('update: ' + src);
 	      }
 	    });
 
