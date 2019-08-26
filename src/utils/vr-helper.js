@@ -6,7 +6,7 @@
 
     const button = document.createElement('button');
     button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
-    button.style.display = '';
+    button.style.display = hasDevice || VRHelper.fullscreenEnabled(document) ? '' : 'none';
     button.style.cursor = 'pointer';
     button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
     button.style.width = '150px';
@@ -59,6 +59,22 @@
     }
 
     return button;
+  }
+
+  static fullscreenEnabled(element) {
+    if (element.fullscreenEnabled !== undefined) {
+      return element.fullscreenEnabled;
+    }
+    if (element.webkitFullscreenEnabld !== undefined) {
+      return element.webkitFullscreenEnabled;
+    }
+    if (element.mozFullScreenEnabled !== undefined) {
+      return element.moxFullScreenEnabled;
+    }
+    if (element.msFullscreenEnabled !== undefined) {
+      return element.msFullscreenEnabled
+    }
+    return false;
   }
 
   static fullscreenElement(element) {
