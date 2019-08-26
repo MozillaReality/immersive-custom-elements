@@ -49979,6 +49979,7 @@
 	    const video = document.createElement('video');
 
 	    video.addEventListener('canplaythrough', event => {
+	      window.alert(event);
 	      readyToStart = true;
 	      play();
 	    });
@@ -49994,9 +49995,6 @@
 	    }, false);
 
 	    const play = () => {
-	      window.alert('readyToStart:' + readyToStart);
-	      window.alert('triggered:' + triggered);
-	      window.alert('paused:' + video.paused);
 	      if (!readyToStart || !triggered || !video.paused) return;
 
 	      // @TODO: proper error handling
