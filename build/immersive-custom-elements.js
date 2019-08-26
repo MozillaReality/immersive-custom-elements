@@ -49979,7 +49979,13 @@
 	    const video = document.createElement('video');
 
 	    video.addEventListener('canplaythrough', event => {
-	      window.alert(event);
+	      window.alert('canplaythrough');
+	      readyToStart = true;
+	      play();
+	    });
+
+	    video.addEventListener('loadedmetadata', event => {
+	      window.alert('loadedmetadata');
 	      readyToStart = true;
 	      play();
 	    });
