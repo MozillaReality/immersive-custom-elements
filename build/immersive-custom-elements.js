@@ -49988,12 +49988,6 @@
 	      play();
 	    });
 
-	    video.addEventListener('loadedmetadata', event => {
-	      window.alert('loadedmetadata');
-	      readyToStart = true;
-	      play();
-	    });
-
 	    renderer.domElement.addEventListener('click', event => {
 	      triggered = true;
 	      play();
@@ -50018,6 +50012,8 @@
 	    // Seems like explicit video.load() call is needed
 	    // for some (mobile?) platforms.
 	    video.load();
+
+	    window.alert(video.src);
 
 	    // Three.js objects
 
