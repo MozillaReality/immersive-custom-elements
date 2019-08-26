@@ -50,15 +50,63 @@
     } else {
       // If no device, enters fullscreen instead.
       button.addEventListener('click', event => {
-        if (document.fullscreenElement === null) {
-          canvas.requestFullscreen();
+        if (VRHelper.fullscreenElement(document) === null) {
+          VRHelper.requestFullscreen(canvas);
         } else {
-          document.exitFullscreen()
+          VRHelper.exitFullscreen(document);
         }
       }, false);
     }
 
     return button;
+  }
+
+  static fullscreenElement(element) {
+    if (element.fullscreenElement !== undefined) {
+      return element.fullscreenElement;
+    }
+    if (element.webkitFullscreenElement !== undefined) {
+      return element.webkitFullscreenElement;
+    }
+    if (element.mozFullScreenElement !== undefined) {
+      return element.mozFullScreenElement;
+    }
+    if (element.msFullscreenElement !== undefined) {
+      return element.msFullscreenElement;
+    }
+    return null; // @TODO: throws here?
+  }
+
+  static requestFullscreen(element) {
+    if (element.requestFullscreen !== undefined) {
+      return element.requestFullscreen();
+    }
+    if (element.webkitRequestFullscreen !== undefined) {
+      return element.webkitRequestFullscreen();
+    }
+    if (element.mozRequestFullScreen !== undefined) {
+      return element.mozRequestFullScreen();
+    }
+    if (element.msRequestFullscreen !== undefined) {
+      return element.msRequestFullscreen();
+    }
+    // @TODO: throws here?
+  }
+
+  static exitFullscreen(element) {
+    if (element.exitFullscreen !== undefined) {
+      return element.exitFullscreen();
+    }
+    if (element.webkitExitFullscreen !== undefined) {
+      return element.webkitExitFullscreen();
+    }
+    if (element.mozCancelFullScreen !== undefined) {
+      return element.mozCancelFullScreen();
+    }
+    if (element.msExitFullscreen !== undefined) {
+      return element.msExitFullscreen();
+    }
+    // @TODO: throws here?
   }
 
   static updateButton(canvas, button) {
