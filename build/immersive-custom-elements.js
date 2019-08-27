@@ -49925,11 +49925,7 @@
 	      VRHelper.getVRDevice(),
 	      DeviceOrientationHelper.hasDeviceOrientation()
 	    ]).then(array => {
-	      try {
-	        this._initialize(array[0], array[1]);
-	      } catch (error) {
-	        window.alert(error.message);
-	      }
+	      this._initialize(array[0], array[1]);
 	    });
 	  }
 
@@ -49983,7 +49979,6 @@
 	    const video = document.createElement('video');
 
 	    video.addEventListener('canplaythrough', event => {
-	      window.alert('canplaythrough');
 	      readyToStart = true;
 	      play();
 	    });
@@ -50012,8 +50007,6 @@
 	    // Seems like explicit video.load() call is needed
 	    // for some (mobile?) platforms.
 	    video.load();
-
-	    window.alert(video.src);
 
 	    // Three.js objects
 
@@ -50092,7 +50085,6 @@
 	        video.src = src;
 	        readyToStart = false;
 	        video.load();
-	        window.alert('update: ' + src);
 	      }
 	    });
 

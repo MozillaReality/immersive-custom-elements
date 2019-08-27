@@ -21,6 +21,7 @@ class Video360 extends HTMLElement {
   }
 
   _initialize(device, hasDeviceOrientation) {
+    hogehoge;
     const hasDevice = device !== null;
 
     // Attributes
@@ -71,13 +72,6 @@ class Video360 extends HTMLElement {
     const video = document.createElement('video');
 
     video.addEventListener('canplaythrough', event => {
-      window.alert('canplaythrough');
-      readyToStart = true;
-      play();
-    });
-
-    video.addEventListener('loadedmetadata', event => {
-      window.alert('loadedmetadata');
       readyToStart = true;
       play();
     });
