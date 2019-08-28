@@ -30,8 +30,8 @@ Add the link to `immersive-custom-elements.js` with `<script>` tag. You can down
 
 ## Custom element tags
 
-- \<img-360\>
-- \<video-360\>
+- [\<img-360\>](#img-360)
+- [\<video-360\>](#video-360)
 
 ### \<img-360\>
 
