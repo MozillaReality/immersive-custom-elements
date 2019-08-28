@@ -49613,7 +49613,7 @@
 	      return element.webkitFullscreenEnabled;
 	    }
 	    if (element.mozFullScreenEnabled !== undefined) {
-	      return element.moxFullScreenEnabled;
+	      return element.mozFullScreenEnabled;
 	    }
 	    if (element.msFullscreenEnabled !== undefined) {
 	      return element.msFullscreenEnabled
