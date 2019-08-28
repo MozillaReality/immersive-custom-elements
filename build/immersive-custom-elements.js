@@ -50004,6 +50004,10 @@
 	    video.loop = loop;
 	    video.muted = muted;
 
+	    // This line is necessary for iOS.
+	    // Otherwise video plays in fullscreen mode as regular video.
+	    video.setAttribute('playsinline', true);
+
 	    // Seems like explicit video.load() call is needed
 	    // for some (mobile?) platforms.
 	    video.load();
