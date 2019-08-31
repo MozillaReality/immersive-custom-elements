@@ -24,7 +24,25 @@
     <ul>
       <li><a href="./img-360.html" target="iframe">&lt;img-360&gt;</a></li>
       <!--<li><a href="./img-360-tour.html" target="iframe">&lt;img360-tour&gt;</a></li>-->
-      <li><a href="./video-360.html" target="iframe">&lt;video-360&gt;</a></li>
+      <li><a href="./video-360.html" target="iframe" id="video-360-a">&lt;video-360&gt;</a></li>
+      <script>
+        // It seems that old iPhone/iPod touch can't play huge video.
+        // So replacing the video-360 example with the smaller video one for such devices.
+        const isOldIphone = () => {
+          // Here very easily detecting. 
+          // Determining the iPhone/iPod touch with equal to or smaller than 667 screen.height
+          // as an old iPhone.
+          // https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html
+          const userAgent = (navigator.userAgent || '').toLowerCase();
+          return ((userAgent.indexOf('iphone') !== -1 ||
+            userAgent.indexOf('ipod') !== -1) &&
+            window.screen.height <= 667);
+        };
+        if (isOldIphone()) {
+          const a = document.getElementById('video-360-a');
+          a.href = './video-360_small.html';
+        }
+      </script>
     </ul>
   </body>
 </html>
