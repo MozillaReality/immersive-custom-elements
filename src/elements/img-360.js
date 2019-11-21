@@ -8,23 +8,19 @@ import {
   DeviceOrientationControlsWrapper,
   DeviceOrientationHelper
 } from '../utils/deviceorientation-helper';
-import {VRHelper} from '../utils/vr-helper';
+import {XRHelper} from '../utils/xr-helper';
 import {THREEHelper} from '../utils/three-helper';
 
 class Img360 extends HTMLElement {
   connectedCallback() {
     Promise.all([
-      VRHelper.getVRDevice(),
       DeviceOrientationHelper.hasDeviceOrientation()
     ]).then(array => {
       this._initialize(array[0], array[1]);
     });
   }
 
-  _initialize(device, hasDeviceOrientation) {
-    const hasDevice = device !== null;
-
-
+  _initialize(hasDeviceOrientation) {
     // Attributes
 
     let src = this.getAttribute('src') || '';
@@ -75,26 +71,20 @@ class Img360 extends HTMLElement {
 
     // VR / Fullscreen
 
-    const button = VRHelper.createButton(renderer.domElement, device);
+    const button = XRHelper.createButton(renderer, controls);
     container.appendChild(button);
 
-    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
-
-    if (hasDevice) {
-      window.addEventListener('vrdisplaypresentchange', event => {
-        if (device.isPresenting) {
-          renderer.setAnimationLoop(render);
-        } else {
-          renderer.setAnimationLoop(null);
-        }
-
-        render();
-      }, false);
-    } else {
-      window.addEventListener('fullscreenchange', event => {
-        render();
-      }, false);
-    }
+    renderer.vr.addEventListener('sessionstart', event => {
+      renderer.setAnimationLoop(render);
+      render()
+    });
+    renderer.vr.addEventListener('sessionend', event => {
+      renderer.setAnimationLoop(null);
+      render();
+    });
+    window.addEventListener('fullscreenchange', event => {
+      render();
+    }, false);
 
 
     // dynamic attributes change
@@ -113,7 +103,7 @@ class Img360 extends HTMLElement {
 
         renderer.setSize(width, height);
 
-        VRHelper.updateButton(renderer.domElement, button);
+        XRHelper.updateButton(renderer.domElement, button);
 
         render();
       }

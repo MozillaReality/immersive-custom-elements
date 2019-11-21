@@ -8,8 +8,7 @@ import {
   RingBufferGeometry,
   SphereBufferGeometry,
   Texture,
-  TextureLoader,
-  Vector2
+  TextureLoader
 } from 'three';
 
 class THREEHelper {
@@ -65,49 +64,6 @@ class THREEHelper {
         transparent: true
       })
     );
-  }
-
-  // @TODO: rename method name to appropriate one
-  static setupVRModeSwitching(renderer, camera, controls, device) {
-    const hasDevice = device !== null;
-    const rendererSize = renderer.getSize(new Vector2());
-    const width = rendererSize.x;
-    const height = rendererSize.y;
-
-    if (hasDevice) {
-      const cameraCache = {
-        position: camera.position.clone(),
-        rotation: camera.rotation.clone()
-      };
-
-      window.addEventListener('vrdisplaypresentchange', event => {
-        if (device.isPresenting) {
-          renderer.vr.enabled = true;
-          controls.enabled = false;
-          cameraCache.position.copy(camera.position);
-          cameraCache.rotation.copy(camera.rotation);
-        } else {
-          renderer.vr.enabled = false;
-          controls.enabled = true;
-          camera.position.copy(cameraCache.position);
-          camera.rotation.copy(cameraCache.rotation);
-        }
-      }, false);
-
-      renderer.vr.setDevice(device);
-    } else {
-      window.addEventListener('fullscreenchange', event => {
-        if (document.fullscreenElement) {
-          camera.aspect = screen.width / screen.height;
-          camera.updateProjectionMatrix();
-          renderer.setSize(screen.width, screen.height);
-        } else {
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
-          renderer.setSize(width, height);
-        }
-      }, false);
-    }
   }
 }
 
