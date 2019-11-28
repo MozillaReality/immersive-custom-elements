@@ -20,7 +20,7 @@ Add the link to `immersive-custom-elements.js` with `<script>` tag. You can down
 ```html
 <html>
   <head>
-    <script src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.1.0/build/immersive-custom-elements.js"></script>
+    <script src="https://rawcdn.githack.com/MozillaReality/immersive-custom-elements/v0.2.0/build/immersive-custom-elements.js"></script>
   </head>
   <body>
     <img-360 src="360-landscape.jpg" width="640" height="360"></img-360>
