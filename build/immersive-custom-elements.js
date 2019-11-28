@@ -50597,68 +50597,7 @@
 	  }
 	}
 
-	class VRHelper {
-	  static createButton(canvas, device) {
-	    // Assumes canvas.style.width has 'zzzpx'
-	    const width = parseInt(canvas.style.width) || canvas.width;
-	    const hasDevice = device !== null;
-
-	    const button = document.createElement('button');
-	    button.textContent = hasDevice ? 'ENTER VR' : 'FULLSCREEN';
-	    button.style.display = hasDevice || VRHelper.fullscreenEnabled(document) ? '' : 'none';
-	    button.style.cursor = 'pointer';
-	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
-	    button.style.width = '150px';
-	    button.style.position = 'absolute';
-	    button.style.bottom = '15px';
-	    button.style.padding = '12px 6px';
-	    button.style.border = '1px solid #fff';
-	    button.style.borderRadius = '4px';
-	    button.style.background = 'rgba(0,0,0,0.1)';
-	    button.style.color = '#fff';
-	    button.style.font = 'normal 13px sans-serif';
-	    button.style.textAlign = 'center';
-	    button.style.opacity = '0.5';
-	    button.style.outline = 'none';
-	    button.style.zIndex = '999';
-
-	    button.addEventListener('mouseenter', event => {
-	      button.style.opacity = '1.0';
-	    }, false);
-
-	    button.addEventListener('mouseleave', event => {
-	      button.style.opacity = '0.5';
-	    }, false);
-
-	    if (hasDevice) {
-	      button.addEventListener('click', event => {
-	        if (device.isPresenting) {
-	          device.exitPresent();
-	        } else {
-	          device.requestPresent([{source: canvas}]);
-	        }      }, false);
-
-	      window.addEventListener('vrdisplaypresentchange', event => {
-	        if (device.isPresenting) {
-	          button.textContent = 'EXIT VR';
-	        } else {
-	          button.textContent = 'ENTER VR';
-	        }
-	      }, false);
-	    } else {
-	      // If no device, enters fullscreen instead.
-	      button.addEventListener('click', event => {
-	        if (VRHelper.fullscreenElement(document) === null) {
-	          VRHelper.requestFullscreen(canvas);
-	        } else {
-	          VRHelper.exitFullscreen(document);
-	        }
-	      }, false);
-	    }
-
-	    return button;
-	  }
-
+	class XRHelper {
 	  static fullscreenEnabled(element) {
 	    if (element.fullscreenEnabled !== undefined) {
 	      return element.fullscreenEnabled;
@@ -50728,20 +50667,130 @@
 	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
 	  }
 
-	  static getVRDevice() {
-	    if (!('getVRDisplays' in navigator)) {
-	      return Promise.resolve(null);
-	    }
+	  static createButton(renderer, controls) {
+	    const canvas = renderer.domElement;
 
-	    return new Promise((resolve, reject) => {
-	      navigator.getVRDisplays().then(devices => {
-	        if (devices && devices.length > 0) {
-	          resolve(devices[0]);
+	    const setupWebXRButton = button => {
+	      button.textContent = 'ENTER XR';  
+	      let currentSession = null;
+	      const onSessionStart = session => {
+	        renderer.vr.enabled = true;
+	        renderer.vr.setSession(session);
+	        controls.enabled = false;
+	        session.addEventListener('end', onSessionEnd);
+	        button.textContent = 'EXIT XR';
+	        currentSession = session;
+	      };
+	      const onSessionEnd = () => {
+	        renderer.vr.enabled = false;
+	        renderer.vr.setSession(null);
+	        controls.enabled = true;
+	        currentSession.removeEventListener('end', onSessionEnd);
+	        button.textContent = 'ENTER XR';
+	        currentSession = null;
+	      };
+	      button.addEventListener('click', event => {
+	        // @TODO: What if another event click triggers before
+	        //        request session promise resolves?
+	        if (currentSession === null) {
+	          navigator.xr.requestSession('immersive-vr', {optionalFeatures: ['local-floor']}).then(onSessionStart);
 	        } else {
-	          resolve(null);
+	          currentSession.end();
 	        }
 	      });
-	    });
+	    };
+
+	    const setupWebVRButton = (button, device) => {
+	      button.textContent = 'ENTER VR';
+	      const onSessionStart = () => {
+	        renderer.vr.enabled = true;
+	        controls.enabled = false;
+	        button.textContent = 'EXIT VR';
+	      };
+	      const onSessionEnd = () => {
+	        renderer.vr.enabled = false;
+	        controls.enabled = true;
+	        button.textContent = 'ENTER VR';
+	      };
+	      button.addEventListener('click', event => {
+	        if (device.isPresenting) {
+	          device.exitPresent();
+	        } else {
+	          device.requestPresent([{source: canvas}]);
+	        }      }, false);
+	      renderer.vr.addEventListener('sessionstart', onSessionStart);
+	      renderer.vr.addEventListener('sessionend', onSessionEnd);
+	      renderer.vr.setDevice(device);
+	    };
+
+	    const setupFullscreenButton = button => {
+	      // If fullscreen isn't supported, give up showing the button.
+	      if (!XRHelper.fullscreenEnabled(document)) {
+	        button.style.display = 'none';
+	        return;
+	      }
+	      button.textContent = 'FULLSCREEN';
+	      button.addEventListener('click', event => {
+	        if (XRHelper.fullscreenElement(document) === null) {
+	          XRHelper.requestFullscreen(canvas);
+	        } else {
+	          XRHelper.exitFullscreen(document);
+	        }
+	      }, false);
+	    };
+
+	    // Assumes canvas.style.width has 'zzzpx'
+	    const width = parseInt(canvas.style.width) || canvas.width;
+
+	    const button = document.createElement('button');
+	    button.style.cursor = 'pointer';
+	    button.style.left = 'calc(' + ((width / 2) | 0) + 'px - 75px)';
+	    button.style.width = '150px';
+	    button.style.position = 'absolute';
+	    button.style.bottom = '15px';
+	    button.style.padding = '12px 6px';
+	    button.style.border = '1px solid #fff';
+	    button.style.borderRadius = '4px';
+	    button.style.background = 'rgba(0,0,0,0.1)';
+	    button.style.color = '#fff';
+	    button.style.font = 'normal 13px sans-serif';
+	    button.style.textAlign = 'center';
+	    button.style.opacity = '0.5';
+	    button.style.outline = 'none';
+	    button.style.zIndex = '999';
+
+	    button.addEventListener('mouseenter', event => {
+	      button.style.opacity = '1.0';
+	    }, false);
+
+	    button.addEventListener('mouseleave', event => {
+	      button.style.opacity = '0.5';
+	    }, false);
+
+	    // Check WebXR compatibility with the same way as Three.js does
+	    if ('xr' in navigator && 'isSessionSupported' in navigator.xr) {
+	      // WebXR API
+	      navigator.xr.isSessionSupported('immersive-vr').then(supported => {
+	        if (supported) {
+	          setupWebXRButton(button);
+	        } else {
+	          setupFullscreenButton(button);
+	        }
+	      });
+	    } else if ('getVRDisplays' in navigator) {
+	      // WebVR API
+	      navigator.getVRDisplays().then(devices => {
+	        if (devices && devices.length > 0) {
+	          setupWebVRButton(button, devices[0]);
+	        } else {
+	          setupFullscreenButton(button);
+	        }
+	      });
+	    } else {
+	      setupFullscreenButton(button);
+	    }
+
+	    return button;
 	  }
 	}
 
@@ -50799,65 +50848,18 @@
 	      })
 	    );
 	  }
-
-	  // @TODO: rename method name to appropriate one
-	  static setupVRModeSwitching(renderer, camera, controls, device) {
-	    const hasDevice = device !== null;
-	    const rendererSize = renderer.getSize(new Vector2());
-	    const width = rendererSize.x;
-	    const height = rendererSize.y;
-
-	    if (hasDevice) {
-	      const cameraCache = {
-	        position: camera.position.clone(),
-	        rotation: camera.rotation.clone()
-	      };
-
-	      window.addEventListener('vrdisplaypresentchange', event => {
-	        if (device.isPresenting) {
-	          renderer.vr.enabled = true;
-	          controls.enabled = false;
-	          cameraCache.position.copy(camera.position);
-	          cameraCache.rotation.copy(camera.rotation);
-	        } else {
-	          renderer.vr.enabled = false;
-	          controls.enabled = true;
-	          camera.position.copy(cameraCache.position);
-	          camera.rotation.copy(cameraCache.rotation);
-	        }
-	      }, false);
-
-	      renderer.vr.setDevice(device);
-	    } else {
-	      window.addEventListener('fullscreenchange', event => {
-	        if (document.fullscreenElement) {
-	          camera.aspect = screen.width / screen.height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(screen.width, screen.height);
-	        } else {
-	          camera.aspect = width / height;
-	          camera.updateProjectionMatrix();
-	          renderer.setSize(width, height);
-	        }
-	      }, false);
-	    }
-	  }
 	}
 
 	class Img360 extends HTMLElement {
 	  connectedCallback() {
 	    Promise.all([
-	      VRHelper.getVRDevice(),
 	      DeviceOrientationHelper.hasDeviceOrientation()
 	    ]).then(array => {
 	      this._initialize(array[0], array[1]);
 	    });
 	  }
 
-	  _initialize(device, hasDeviceOrientation) {
-	    const hasDevice = device !== null;
-
-
+	  _initialize(hasDeviceOrientation) {
 	    // Attributes
 
 	    let src = this.getAttribute('src') || '';
@@ -50908,26 +50910,20 @@
 
 	    // VR / Fullscreen
 
-	    const button = VRHelper.createButton(renderer.domElement, device);
+	    const button = XRHelper.createButton(renderer, controls);
 	    container.appendChild(button);
 
-	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
-
-	    if (hasDevice) {
-	      window.addEventListener('vrdisplaypresentchange', event => {
-	        if (device.isPresenting) {
-	          renderer.setAnimationLoop(render);
-	        } else {
-	          renderer.setAnimationLoop(null);
-	        }
-
-	        render();
-	      }, false);
-	    } else {
-	      window.addEventListener('fullscreenchange', event => {
-	        render();
-	      }, false);
-	    }
+	    renderer.vr.addEventListener('sessionstart', event => {
+	      renderer.setAnimationLoop(render);
+	      render();
+	    });
+	    renderer.vr.addEventListener('sessionend', event => {
+	      renderer.setAnimationLoop(null);
+	      render();
+	    });
+	    window.addEventListener('fullscreenchange', event => {
+	      render();
+	    }, false);
 
 
 	    // dynamic attributes change
@@ -50946,7 +50942,7 @@
 
 	        renderer.setSize(width, height);
 
-	        VRHelper.updateButton(renderer.domElement, button);
+	        XRHelper.updateButton(renderer.domElement, button);
 
 	        render();
 	      }
@@ -50976,15 +50972,13 @@
 	class Video360 extends HTMLElement {
 	  connectedCallback() {
 	    Promise.all([
-	      VRHelper.getVRDevice(),
 	      DeviceOrientationHelper.hasDeviceOrientation()
 	    ]).then(array => {
 	      this._initialize(array[0], array[1]);
 	    });
 	  }
 
-	  _initialize(device, hasDeviceOrientation) {
-
+	  _initialize(hasDeviceOrientation) {
 	    // Attributes
 
 	    let src = this.getAttribute('src') || '';
@@ -51087,16 +51081,13 @@
 
 	    // VR / Fullscreen
 
-	    const button = VRHelper.createButton(renderer.domElement, device);
+	    const button = XRHelper.createButton(renderer, controls);
 	    container.appendChild(button);
 
-	    THREEHelper.setupVRModeSwitching(renderer, camera, controls, device);
-
-	    window.addEventListener('vrdisplaypresentchange', event => {
+	    renderer.vr.addEventListener('sessionstart', event => {
 	      triggered = true;
 	      play();
-	    }, false);
-
+	    });
 	    document.addEventListener('fullscreenchange', event => {
 	      triggered = true;
 	      play();
@@ -51121,7 +51112,7 @@
 
 	        renderer.setSize(width, height);
 
-	        VRHelper.updateButton(renderer.domElement, button);
+	        XRHelper.updateButton(renderer.domElement, button);
 	      }
 
 	      if (newLoop !== loop) {
